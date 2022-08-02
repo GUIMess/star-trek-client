@@ -5,7 +5,7 @@ const PORT = 8000
 require('dotenv').config() //import dotenv
 console.log(process.env)
 const MongoClient = require('mongodb').MongoClient //import mongo client
-const connectionString = DB_STRING //set connection string
+
 
 app.use(cors()) //set cors
 app.use(express.json()) //set json
