@@ -1,0 +1,713 @@
+{
+  "sources": [
+    {
+      "key": "screen-canon",
+      "label": "Screen canon",
+      "sourceType": "canon",
+      "url": "https://memory-alpha.fandom.com/wiki/Star_Trek",
+      "canonWeight": 1
+    },
+    {
+      "key": "memory-alpha",
+      "label": "Memory Alpha",
+      "sourceType": "reference",
+      "url": "https://memory-alpha.fandom.com",
+      "canonWeight": 0.88
+    },
+    {
+      "key": "operator-notes",
+      "label": "Operator notes",
+      "sourceType": "curated",
+      "url": null,
+      "canonWeight": 0.72
+    }
+  ],
+  "entities": [
+    {
+      "slug": "vulcan-species",
+      "displayName": "Vulcans",
+      "entityType": "species",
+      "summary": "Founding Federation species known for disciplined logic, ritualized culture, and unusually stable long-range thinking.",
+      "canonTier": "screen",
+      "threatLevel": "low",
+      "diplomaticPosture": "measured and formal",
+      "era": "22nd-24th century",
+      "tags": ["federation", "logic", "founder"],
+      "profile": {
+        "station": "Diplomatic and scientific anchor",
+        "interactionStyle": "Protocol-heavy, emotionally restrained"
+      },
+      "aliases": ["Vulcan", "Vulcan people"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Homeworld",
+          "value": "Vulcan",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "culture",
+          "label": "Cultural profile",
+          "value": "Logic-forward, ritualized, and highly controlled in public conduct.",
+          "importance": 95,
+          "confidence": 0.95,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "operations",
+          "label": "Diplomatic posture",
+          "value": "Measured, precise, and generally stable when protocol is respected.",
+          "importance": 90,
+          "confidence": 0.9,
+          "sourceKey": "operator-notes"
+        },
+        {
+          "section": "operations",
+          "label": "Operational caution",
+          "value": "Do not misread restraint as passivity; they will defend principle with unusual firmness.",
+          "importance": 92,
+          "confidence": 0.83,
+          "sourceKey": "operator-notes"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "planet-vulcan",
+          "type": "originates_from",
+          "description": "Native species of the planet Vulcan.",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "united-federation-of-planets",
+          "type": "founding_member_of",
+          "description": "One of the major founding cultures of the Federation.",
+          "importance": 95,
+          "confidence": 0.97,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "romulan-species",
+          "type": "ancestral_link",
+          "description": "Romulans descend from an ancient Vulcan exodus.",
+          "importance": 90,
+          "confidence": 0.95,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "spock",
+          "type": "notable_representative",
+          "description": "Spock is one of the most influential Vulcans in Starfleet history.",
+          "importance": 75,
+          "confidence": 0.96,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2150s",
+          "sortKey": 2154,
+          "headline": "Federation-era alliance building",
+          "detail": "Vulcan diplomacy and science shape the conditions that lead into Federation formation.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "romulan-species",
+      "displayName": "Romulans",
+      "entityType": "species",
+      "summary": "Secretive descendants of ancient Vulcans who built an intelligence-heavy imperial state.",
+      "canonTier": "screen",
+      "threatLevel": "high",
+      "diplomaticPosture": "guarded and coercive",
+      "era": "22nd-24th century",
+      "tags": ["empire", "intelligence", "vulcan-schism"],
+      "profile": {
+        "station": "Strategic rival power",
+        "interactionStyle": "Opacity, leverage, layered intent"
+      },
+      "aliases": ["Romulan", "Romulan people"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Homeworld",
+          "value": "Romulus",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "culture",
+          "label": "Cultural profile",
+          "value": "Statecraft shaped by secrecy, honor, ambition, and internal surveillance.",
+          "importance": 95,
+          "confidence": 0.93,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "operations",
+          "label": "Operational caution",
+          "value": "Assume hidden objectives, compartmented actors, and intelligence collection in formal exchange.",
+          "importance": 98,
+          "confidence": 0.9,
+          "sourceKey": "operator-notes"
+        },
+        {
+          "section": "operations",
+          "label": "Threat profile",
+          "value": "High strategic threat; prefers indirect pressure before open conflict.",
+          "importance": 94,
+          "confidence": 0.89,
+          "sourceKey": "operator-notes"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "planet-romulus",
+          "type": "originates_from",
+          "description": "Home species of Romulus.",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "vulcan-species",
+          "type": "ancestral_link",
+          "description": "Descended from Vulcan dissidents who rejected Surak's reforms.",
+          "importance": 96,
+          "confidence": 0.95,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "united-federation-of-planets",
+          "type": "strategic_rival_of",
+          "description": "Long-standing political and intelligence rival of the Federation.",
+          "importance": 92,
+          "confidence": 0.95,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "24th century",
+          "sortKey": 2364,
+          "headline": "Open re-entry into Federation affairs",
+          "detail": "Romulans reassert visible presence after a long period of strategic opacity.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "klingon-species",
+      "displayName": "Klingons",
+      "entityType": "species",
+      "summary": "Martial imperial culture with strong codes of honor, political volatility, and deep respect for strength.",
+      "canonTier": "screen",
+      "threatLevel": "medium",
+      "diplomaticPosture": "direct and status-sensitive",
+      "era": "22nd-24th century",
+      "tags": ["empire", "warrior", "ally-rival"],
+      "profile": {
+        "station": "Periodic rival, later treaty ally",
+        "interactionStyle": "Direct, status-based, honor-centered"
+      },
+      "aliases": ["Klingon", "Klingon people"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Homeworld",
+          "value": "Qo'noS",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "culture",
+          "label": "Cultural profile",
+          "value": "Honor, martial reputation, lineage, and visible courage dominate public life.",
+          "importance": 96,
+          "confidence": 0.95,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "operations",
+          "label": "Operational caution",
+          "value": "Loss of face can escalate a minor disagreement into a personal or state insult.",
+          "importance": 92,
+          "confidence": 0.86,
+          "sourceKey": "operator-notes"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "planet-qonos",
+          "type": "originates_from",
+          "description": "Native species of Qo'noS.",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "khitomer-accords",
+          "type": "signatory_to",
+          "description": "Klingon diplomacy turns after the Khitomer Accords.",
+          "importance": 94,
+          "confidence": 0.96,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "united-federation-of-planets",
+          "type": "treaty_partner_of",
+          "description": "From bitter rival to critical strategic ally.",
+          "importance": 90,
+          "confidence": 0.95,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2293",
+          "sortKey": 2293,
+          "headline": "Khitomer resets the political board",
+          "detail": "Praxis crisis and Khitomer diplomacy begin the path toward alliance.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "borg-collective",
+      "displayName": "Borg Collective",
+      "entityType": "collective",
+      "summary": "Cybernetic hive civilization oriented around assimilation, scale, and tactical adaptation.",
+      "canonTier": "screen",
+      "threatLevel": "critical",
+      "diplomaticPosture": "non-reciprocal",
+      "era": "24th century",
+      "tags": ["collective", "assimilation", "existential-threat"],
+      "profile": {
+        "station": "Existential systems threat",
+        "interactionStyle": "One-way coercive integration"
+      },
+      "aliases": ["Borg", "The Borg"],
+      "facts": [
+        {
+          "section": "culture",
+          "label": "Cultural profile",
+          "value": "Collective consciousness with no meaningful individual sovereignty in standard drone operations.",
+          "importance": 98,
+          "confidence": 0.98,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "operations",
+          "label": "Threat profile",
+          "value": "Critical strategic threat; force multiplication through assimilation and adaptation.",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "section": "operations",
+          "label": "Operational caution",
+          "value": "Do not treat contact as diplomacy; the Collective frames contact as ingestion.",
+          "importance": 100,
+          "confidence": 0.94,
+          "sourceKey": "operator-notes"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "uss-enterprise-d",
+          "type": "primary_adversary_of",
+          "description": "One of the defining strategic enemies faced by the Enterprise-D crew.",
+          "importance": 90,
+          "confidence": 0.97,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "jean-luc-picard",
+          "type": "has_assimilated",
+          "description": "Picard's assimilation as Locutus defines one of Starfleet's central trauma events.",
+          "importance": 95,
+          "confidence": 0.98,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2365",
+          "sortKey": 2365,
+          "headline": "Federation contact escalates",
+          "detail": "The Federation's strategic assumptions change sharply after first meaningful Borg encounters.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "united-federation-of-planets",
+      "displayName": "United Federation of Planets",
+      "entityType": "faction",
+      "summary": "Interstellar union built on mutual defense, exploratory ambition, and pluralist governance.",
+      "canonTier": "screen",
+      "threatLevel": "n/a",
+      "diplomaticPosture": "coalitional and rules-based",
+      "era": "22nd-24th century",
+      "tags": ["federation", "starfleet", "coalition"],
+      "profile": {
+        "station": "Reference polity",
+        "interactionStyle": "Treaty systems, multilateral norms, exploratory mandate"
+      },
+      "aliases": ["Federation", "UFP"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Founding profile",
+          "value": "Coalition of member worlds including Earth, Vulcan, Andoria, and Tellar.",
+          "importance": 98,
+          "confidence": 0.96,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "vulcan-species",
+          "type": "includes_founder",
+          "description": "Vulcans anchor the Federation's scientific and diplomatic culture.",
+          "importance": 92,
+          "confidence": 0.97,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "uss-enterprise-d",
+          "type": "operates",
+          "description": "Flagship-class Federation exploratory and diplomatic vessel.",
+          "importance": 84,
+          "confidence": 0.97,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2161",
+          "sortKey": 2161,
+          "headline": "Federation established",
+          "detail": "Interstellar coalition formalizes into a durable political body.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "planet-vulcan",
+      "displayName": "Vulcan",
+      "entityType": "world",
+      "summary": "Arid homeworld of the Vulcans and one of the Federation's most influential founding planets.",
+      "canonTier": "screen",
+      "threatLevel": "low",
+      "diplomaticPosture": "stable",
+      "era": "persistent",
+      "tags": ["world", "founder-world"],
+      "profile": {
+        "quadrant": "Beta Quadrant"
+      },
+      "aliases": ["Planet Vulcan"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Environment",
+          "value": "Hot, arid, and environmentally demanding by many humanoid standards.",
+          "importance": 85,
+          "confidence": 0.9,
+          "sourceKey": "memory-alpha"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "vulcan-species",
+          "type": "home_to",
+          "description": "Primary world of the Vulcan species.",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": []
+    },
+    {
+      "slug": "planet-romulus",
+      "displayName": "Romulus",
+      "entityType": "world",
+      "summary": "Capital world of Romulan power and a symbol of the empire's secrecy and central control.",
+      "canonTier": "screen",
+      "threatLevel": "high",
+      "diplomaticPosture": "guarded",
+      "era": "persistent",
+      "tags": ["world", "capital"],
+      "profile": {
+        "quadrant": "Beta Quadrant"
+      },
+      "aliases": [],
+      "facts": [],
+      "relationships": [
+        {
+          "targetSlug": "romulan-species",
+          "type": "home_to",
+          "description": "Primary world of the Romulan people.",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": []
+    },
+    {
+      "slug": "planet-qonos",
+      "displayName": "Qo'noS",
+      "entityType": "world",
+      "summary": "Homeworld of the Klingons and symbolic center of imperial authority and honor culture.",
+      "canonTier": "screen",
+      "threatLevel": "medium",
+      "diplomaticPosture": "status-sensitive",
+      "era": "persistent",
+      "tags": ["world", "capital"],
+      "profile": {
+        "quadrant": "Beta Quadrant"
+      },
+      "aliases": ["Kronos"],
+      "facts": [],
+      "relationships": [
+        {
+          "targetSlug": "klingon-species",
+          "type": "home_to",
+          "description": "Primary world of Klingon civilization.",
+          "importance": 100,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": []
+    },
+    {
+      "slug": "spock",
+      "displayName": "Spock",
+      "entityType": "person",
+      "summary": "Vulcan-Human officer, diplomat, and strategic bridge between logic, exploration, and political reconciliation.",
+      "canonTier": "screen",
+      "threatLevel": "low",
+      "diplomaticPosture": "analytical and empathetic",
+      "era": "23rd-24th century",
+      "tags": ["starfleet", "diplomacy", "vulcan"],
+      "profile": {
+        "service": "Starfleet",
+        "specialty": "Science, diplomacy, strategic mediation"
+      },
+      "aliases": ["Ambassador Spock"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Heritage",
+          "value": "Half-Vulcan, half-Human.",
+          "importance": 96,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "vulcan-species",
+          "type": "member_of",
+          "description": "One of the best-known Vulcans in Federation history.",
+          "importance": 90,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "khitomer-accords",
+          "type": "helped_enable",
+          "description": "His diplomacy contributes to the Klingon-Federation thaw.",
+          "importance": 84,
+          "confidence": 0.95,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2293",
+          "sortKey": 2293,
+          "headline": "Drives Klingon peace effort",
+          "detail": "Spock acts as a critical architect of the diplomatic shift around Khitomer.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "jean-luc-picard",
+      "displayName": "Jean-Luc Picard",
+      "entityType": "person",
+      "summary": "Starfleet captain whose command style combines diplomacy, restraint, and strategic clarity under pressure.",
+      "canonTier": "screen",
+      "threatLevel": "low",
+      "diplomaticPosture": "principled and direct",
+      "era": "24th century",
+      "tags": ["starfleet", "captain", "diplomacy"],
+      "profile": {
+        "service": "Starfleet",
+        "command": "USS Enterprise-D"
+      },
+      "aliases": ["Captain Picard", "Picard"],
+      "facts": [
+        {
+          "section": "operations",
+          "label": "Command profile",
+          "value": "Prefers reasoned de-escalation but can pivot quickly to hard defensive action.",
+          "importance": 94,
+          "confidence": 0.9,
+          "sourceKey": "operator-notes"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "uss-enterprise-d",
+          "type": "commands",
+          "description": "Captain of the Enterprise-D through its principal service life.",
+          "importance": 95,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "borg-collective",
+          "type": "survived_assimilation_by",
+          "description": "Picard's assimilation defines a major Federation trauma and intelligence case study.",
+          "importance": 95,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2366",
+          "sortKey": 2366,
+          "headline": "Assimilated as Locutus",
+          "detail": "The Borg weaponize Picard's knowledge against Starfleet.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "uss-enterprise-d",
+      "displayName": "USS Enterprise-D",
+      "entityType": "ship",
+      "summary": "Galaxy-class Federation flagship built as a mobile diplomatic, scientific, and command platform.",
+      "canonTier": "screen",
+      "threatLevel": "n/a",
+      "diplomaticPosture": "flagship",
+      "era": "24th century",
+      "tags": ["starfleet", "flagship", "galaxy-class"],
+      "profile": {
+        "registry": "NCC-1701-D",
+        "class": "Galaxy-class"
+      },
+      "aliases": ["Enterprise-D", "USS Enterprise"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Platform role",
+          "value": "Exploration, diplomacy, command presence, and high-end crisis response.",
+          "importance": 95,
+          "confidence": 0.98,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "united-federation-of-planets",
+          "type": "operated_by",
+          "description": "Federation flagship and Starfleet instrument.",
+          "importance": 90,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "jean-luc-picard",
+          "type": "commanded_by",
+          "description": "Primary command ship of Jean-Luc Picard.",
+          "importance": 95,
+          "confidence": 0.99,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "borg-collective",
+          "type": "opposed",
+          "description": "Front-line vessel in some of the Federation's most consequential Borg encounters.",
+          "importance": 88,
+          "confidence": 0.96,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2364",
+          "sortKey": 2364,
+          "headline": "Flagship enters service",
+          "detail": "The Enterprise-D begins a service life centered on diplomacy, exploration, and crisis response.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    },
+    {
+      "slug": "khitomer-accords",
+      "displayName": "Khitomer Accords",
+      "entityType": "event",
+      "summary": "Diplomatic turning point that shifts the Federation and Klingon Empire away from entrenched hostility.",
+      "canonTier": "screen",
+      "threatLevel": "n/a",
+      "diplomaticPosture": "treaty landmark",
+      "era": "2293 onward",
+      "tags": ["treaty", "diplomacy", "klingon"],
+      "profile": {
+        "category": "treaty event"
+      },
+      "aliases": ["Khitomer", "Accords of Khitomer"],
+      "facts": [
+        {
+          "section": "identity",
+          "label": "Strategic result",
+          "value": "Creates the political path from Cold War hostility toward alliance.",
+          "importance": 98,
+          "confidence": 0.98,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "relationships": [
+        {
+          "targetSlug": "klingon-species",
+          "type": "reshaped_relations_with",
+          "description": "Resets Klingon-Federation political assumptions.",
+          "importance": 95,
+          "confidence": 0.97,
+          "sourceKey": "screen-canon"
+        },
+        {
+          "targetSlug": "united-federation-of-planets",
+          "type": "reshaped_relations_with",
+          "description": "Marks a decisive Federation diplomatic win with strategic consequences.",
+          "importance": 95,
+          "confidence": 0.97,
+          "sourceKey": "screen-canon"
+        }
+      ],
+      "timeline": [
+        {
+          "eraLabel": "2293",
+          "sortKey": 2293,
+          "headline": "Treaty point of inflection",
+          "detail": "Praxis destabilization and intense diplomacy culminate in a durable strategic realignment.",
+          "sourceKey": "screen-canon"
+        }
+      ]
+    }
+  ]
+}
