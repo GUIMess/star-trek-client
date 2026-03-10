@@ -19,6 +19,10 @@ import {
   type ArchiveMode,
 } from "../lib/field-guide";
 
+type MainScreen = "dossier" | "relations" | "timeline" | "compare" | "sources";
+type SidePanel = "readout" | "profile" | "search" | "launch";
+type LowerPanel = "timeline" | "compare" | "sources" | "launch";
+
 const modeDeck: Array<{
   id: ArchiveMode;
   code: string;
@@ -29,26 +33,48 @@ const modeDeck: Array<{
     id: "field-guide",
     code: "FG-01",
     label: "Field Guide",
-    summary: "Cross-linked archive view for browsing species, worlds, ships, and treaty events.",
+    summary: "General archive lens for species, worlds, ships, factions, and incidents.",
   },
   {
     id: "first-contact",
     code: "FC-02",
     label: "First Contact",
-    summary: "Prioritizes diplomacy posture, cultural profile, and away-team cautions.",
+    summary: "Pushes cultural posture, away-team cautions, and contact protocol forward.",
   },
   {
     id: "diplomatic",
     code: "DP-03",
     label: "Diplomatic",
-    summary: "Surfaces protocol, strategic posture, and relationship signals first.",
+    summary: "Weights treaty history, negotiation posture, and strategic relationships.",
   },
   {
     id: "threat",
     code: "TH-04",
     label: "Threat",
-    summary: "Frames the dossier around threat posture, operational caution, and strategic risk.",
+    summary: "Frames the dossier around operational caution, pressure points, and risk.",
   },
+];
+
+const screenDeck: Array<{ id: MainScreen; label: string; code: string }> = [
+  { id: "dossier", label: "Dossier", code: "D-01" },
+  { id: "relations", label: "Relations", code: "R-02" },
+  { id: "timeline", label: "Timeline", code: "T-03" },
+  { id: "compare", label: "Compare", code: "C-04" },
+  { id: "sources", label: "Sources", code: "S-05" },
+];
+
+const sideDeck: Array<{ id: SidePanel; label: string }> = [
+  { id: "readout", label: "Readout" },
+  { id: "profile", label: "Profile" },
+  { id: "search", label: "Jump" },
+  { id: "launch", label: "Launch" },
+];
+
+const lowerDeck: Array<{ id: LowerPanel; label: string }> = [
+  { id: "timeline", label: "Timeline" },
+  { id: "compare", label: "Compare" },
+  { id: "sources", label: "Sources" },
+  { id: "launch", label: "Launch" },
 ];
 
 function formatThreat(value: string) {
@@ -58,6 +84,21 @@ function formatThreat(value: string) {
 
 function formatConfidence(value: number) {
   return `${Math.round(value * 100)}%`;
+}
+
+function formatLabel(value: string) {
+  return value
+    .replace(/([A-Z])/g, " $1")
+    .replaceAll("_", " ")
+    .trim();
+}
+
+function formatType(value: string) {
+  return value
+    .split(/[\s-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 function buildStardate() {
@@ -70,24 +111,42 @@ function buildStardate() {
 }
 
 function buildScanBars(primaryFacts: Array<{ importance: number }>) {
-  return primaryFacts.slice(0, 6).map((fact, index) => ({
+  return primaryFacts.slice(0, 5).map((fact, index) => ({
     id: `${fact.importance}-${index}`,
-    height: `${28 + Math.round((fact.importance / 100) * 72)}%`,
+    height: `${26 + Math.round((fact.importance / 100) * 74)}%`,
   }));
 }
 
-const revealVariant: Variants = {
-  hidden: { opacity: 0, y: 24 },
+const shellVariant: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const panelVariant: Variants = {
+  hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] },
   },
+};
+
+const screenTransition = {
+  initial: { opacity: 0, x: 20, scale: 0.985 },
+  animate: { opacity: 1, x: 0, scale: 1 },
+  exit: { opacity: 0, x: -20, scale: 0.985 },
+  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
 };
 
 export function FieldGuideApp() {
   const reducedMotion = useReducedMotion();
   const [mode, setMode] = useState<ArchiveMode>("field-guide");
+  const [mainScreen, setMainScreen] = useState<MainScreen>("dossier");
+  const [sidePanel, setSidePanel] = useState<SidePanel>("readout");
+  const [lowerPanel, setLowerPanel] = useState<LowerPanel>("timeline");
   const [activeSection, setActiveSection] = useState<string | "all">("all");
   const [activeSlug, setActiveSlug] = useState(defaultPrimarySlug);
   const [compareSlug, setCompareSlug] = useState<string | null>(defaultCompareSlug);
@@ -106,7 +165,7 @@ export function FieldGuideApp() {
   const compareRecord = compareSlug ? getHydratedEntity(compareSlug, mode) : null;
   const comparison = compareSlug ? buildComparison(activeSlug, compareSlug) : null;
   const searchResults = deferredQuery.trim() ? searchArchive(deferredQuery) : [];
-  const browseRecords = (
+  const launchRecords = (
     activeSection === "all"
       ? featuredRecords
       : listEntitiesByType(activeSection)
@@ -116,40 +175,26 @@ export function FieldGuideApp() {
   const relatedTargets = activeRecord.relationTargets
     .map((relationship) => relationship.target)
     .filter((entity): entity is NonNullable<typeof entity> => entity !== null)
-    .slice(0, 4);
+    .slice(0, 6);
   const scanBars = buildScanBars(activeRecord.primaryFacts);
   const activeMode = modeDeck.find((entry) => entry.id === mode) ?? modeDeck[0];
-  const launchRecords = featuredRecords.slice(0, 4);
-  const mastheadMetrics = [
-    {
-      label: "Indexed entities",
-      value: archiveStats.entityCount,
-      detail: "species, worlds, ships, captains",
-      fill: Math.min(100, archiveStats.entityCount * 6),
-    },
-    {
-      label: "Relation links",
-      value: archiveStats.relationCount,
-      detail: "cross-referenced across the archive",
-      fill: Math.min(100, archiveStats.relationCount * 3),
-    },
-    {
-      label: "Timeline beats",
-      value: archiveStats.timelineCount,
-      detail: "eras and incidents already staged",
-      fill: Math.min(100, archiveStats.timelineCount * 10),
-    },
-    {
-      label: "Source classes",
-      value: archiveStats.sourceCount,
-      detail: "screen canon, reference, operator notes",
-      fill: Math.min(100, archiveStats.sourceCount * 24),
-    },
+  const activeMainScreen = screenDeck.find((entry) => entry.id === mainScreen) ?? screenDeck[0];
+
+  const topMetrics = [
+    { label: "Archive", value: archiveStats.entityCount, detail: "indexed records" },
+    { label: "Links", value: archiveStats.relationCount, detail: "cross-references" },
+    { label: "Era trail", value: archiveStats.timelineCount, detail: "timeline beats" },
+    { label: "Sources", value: archiveStats.sourceCount, detail: "canon classes" },
   ];
 
-  function focusEntity(slug: string) {
+  function focusEntity(slug: string, targetScreen: MainScreen = "dossier") {
     startTransition(() => {
       setActiveSlug(slug);
+      setMainScreen(targetScreen);
+      setSidePanel("readout");
+      if (targetScreen === "timeline") {
+        setLowerPanel("timeline");
+      }
     });
   }
 
@@ -158,103 +203,592 @@ export function FieldGuideApp() {
 
     startTransition(() => {
       setCompareSlug(slug);
+      setMainScreen("compare");
+      setLowerPanel("compare");
+      setSidePanel("launch");
     });
+  }
+
+  function changeMode(nextMode: ArchiveMode) {
+    startTransition(() => {
+      setMode(nextMode);
+      setSidePanel("readout");
+    });
+  }
+
+  function retuneSection(section: string | "all", leadSlug?: string) {
+    startTransition(() => {
+      setActiveSection(section);
+      setLowerPanel("launch");
+      setSidePanel("launch");
+      if (leadSlug) {
+        setActiveSlug(leadSlug);
+        setMainScreen("dossier");
+      }
+    });
+  }
+
+  function openMainScreen(screen: MainScreen) {
+    startTransition(() => {
+      setMainScreen(screen);
+      if (screen === "compare") {
+        setLowerPanel("compare");
+      } else if (screen === "timeline") {
+        setLowerPanel("timeline");
+      } else if (screen === "sources") {
+        setLowerPanel("sources");
+      }
+    });
+  }
+
+  function renderMainScreen() {
+    if (mainScreen === "relations") {
+      return (
+        <motion.section className="console-screen map-screen" key={`${mainScreen}-${activeRecord.slug}`} {...screenTransition}>
+          <div className="screen-panel screen-panel-map">
+            <div className="screen-heading">
+              <div>
+                <p className="eyebrow">Relation map</p>
+                <h2>{activeRecord.displayName}</h2>
+              </div>
+              <div className="screen-actions">
+                <button type="button" onClick={() => openMainScreen("timeline")}>
+                  Open timeline
+                </button>
+                <button type="button" onClick={() => setSidePanel("launch")}>
+                  Launch deck
+                </button>
+              </div>
+            </div>
+            <div className="map-screen-layout">
+              <div className="map-stage">
+                <RelationOrbit compareSlug={compareSlug} entity={activeRecord} onCompare={dockCompare} onSelect={focusEntity} />
+              </div>
+              <div className="map-legend">
+                {activeRecord.relationTargets.map((relation) => (
+                  <article className="map-legend-row" key={`${activeRecord.slug}-${relation.targetSlug}`}>
+                    <div>
+                      <span>{relation.typeLabel}</span>
+                      <strong>{relation.target?.displayName ?? relation.targetSlug}</strong>
+                      <p>{relation.description}</p>
+                    </div>
+                    <div className="legend-actions">
+                      {relation.target ? (
+                        <>
+                          <button type="button" onClick={() => focusEntity(relation.target!.slug, "dossier")}>
+                            Open
+                          </button>
+                          <button type="button" onClick={() => dockCompare(relation.target!.slug)}>
+                            Dock
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.section>
+      );
+    }
+
+    if (mainScreen === "timeline") {
+      return (
+        <motion.section className="console-screen timeline-screen" key={`${mainScreen}-${activeRecord.slug}`} {...screenTransition}>
+          <div className="screen-panel">
+            <div className="screen-heading">
+              <div>
+                <p className="eyebrow">Era trail</p>
+                <h2>{activeRecord.displayName}</h2>
+              </div>
+              <div className="screen-meta">
+                <span>{activeRecord.timelineTrail.length || 1} indexed events</span>
+              </div>
+            </div>
+            <div className="timeline-screen-grid">
+              {activeRecord.timelineTrail.length ? (
+                activeRecord.timelineTrail.map((event, index) => (
+                  <motion.article
+                    className="timeline-screen-card"
+                    key={`${event.eraLabel}-${event.headline}`}
+                    initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.28, delay: reducedMotion ? 0 : index * 0.05 }}
+                  >
+                    <span>{event.eraLabel}</span>
+                    <strong>{event.headline}</strong>
+                    <p>{event.detail}</p>
+                    <small>{event.source?.label ?? "Archive source"}</small>
+                  </motion.article>
+                ))
+              ) : (
+                <article className="timeline-screen-card is-empty">
+                  <span>Archive gap</span>
+                  <strong>No discrete timeline beats loaded.</strong>
+                  <p>The record still anchors through relationships, identity facts, and source trail.</p>
+                </article>
+              )}
+            </div>
+          </div>
+        </motion.section>
+      );
+    }
+
+    if (mainScreen === "compare") {
+      return (
+        <motion.section className="console-screen compare-screen" key={`${mainScreen}-${activeRecord.slug}-${compareSlug ?? "empty"}`} {...screenTransition}>
+          <div className="screen-panel">
+            <div className="screen-heading">
+              <div>
+                <p className="eyebrow">Compare deck</p>
+                <h2>{comparison ? `${comparison.left.displayName} / ${comparison.right.displayName}` : "Awaiting second dossier"}</h2>
+              </div>
+              <div className="screen-actions">
+                <button type="button" onClick={() => setLowerPanel("compare")}>
+                  Lower compare
+                </button>
+                <button type="button" onClick={() => setSidePanel("launch")}>
+                  Open launch
+                </button>
+              </div>
+            </div>
+            {comparison ? (
+              <div className="compare-screen-grid">
+                <article className="compare-hero-card">
+                  <span>{comparison.left.entityType}</span>
+                  <strong>{comparison.left.displayName}</strong>
+                  <p>{comparison.left.summary}</p>
+                </article>
+                <article className="compare-hero-card">
+                  <span>{comparison.right.entityType}</span>
+                  <strong>{comparison.right.displayName}</strong>
+                  <p>{comparison.right.summary}</p>
+                </article>
+                <article className="compare-detail-card">
+                  <p className="eyebrow">Shared</p>
+                  {comparison.shared.length ? (
+                    <ul>
+                      {comparison.shared.map((item) => (
+                        <li key={item.label}>
+                          <strong>{item.label}</strong>
+                          <span>{item.left}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="screen-placeholder">No shared high-weight facts in the current compare window.</p>
+                  )}
+                </article>
+                <article className="compare-detail-card">
+                  <p className="eyebrow">Contrast</p>
+                  {comparison.contrast.length ? (
+                    <ul>
+                      {comparison.contrast.map((item) => (
+                        <li key={item.label}>
+                          <strong>{item.label}</strong>
+                          <span>{comparison.left.displayName}: {item.left ?? "n/a"}</span>
+                          <span>{comparison.right.displayName}: {item.right ?? "n/a"}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="screen-placeholder">No contrast surfaced in the current compare window.</p>
+                  )}
+                </article>
+              </div>
+            ) : (
+              <div className="screen-empty-state">
+                <p>Dock a second dossier from the relation map, launch deck, or archive jump panel.</p>
+                <div className="screen-actions">
+                  {relatedTargets.slice(0, 3).map((target) => (
+                    <button key={target.slug} type="button" onClick={() => dockCompare(target.slug)}>
+                      Dock {target.displayName}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.section>
+      );
+    }
+
+    if (mainScreen === "sources") {
+      return (
+        <motion.section className="console-screen sources-screen" key={`${mainScreen}-${activeRecord.slug}`} {...screenTransition}>
+          <div className="screen-panel">
+            <div className="screen-heading">
+              <div>
+                <p className="eyebrow">Source trail</p>
+                <h2>{activeRecord.displayName}</h2>
+              </div>
+              <div className="screen-meta">
+                <span>{activeRecord.sourceTrail.length} source anchors</span>
+              </div>
+            </div>
+            <div className="sources-screen-grid">
+              {activeRecord.sourceTrail.map((source) => (
+                <article className="source-screen-card" key={source.key}>
+                  <div className="source-screen-head">
+                    <strong>{source.label}</strong>
+                    <span>{source.sourceType}</span>
+                  </div>
+                  <div className="source-bar-track">
+                    <span className="source-bar-fill" style={{ width: `${Math.round(source.canonWeight * 100)}%` }} />
+                  </div>
+                  <p>{Math.round(source.canonWeight * 100)}% trust weighting</p>
+                </article>
+              ))}
+              <article className="source-screen-card source-index-card">
+                <p className="eyebrow">Archive index</p>
+                <div className="source-legend">
+                  {sourceRecords.map((source) => (
+                    <span key={source.key}>{source.label}</span>
+                  ))}
+                </div>
+              </article>
+            </div>
+          </div>
+        </motion.section>
+      );
+    }
+
+    return (
+      <motion.section className="console-screen dossier-screen" key={`${mainScreen}-${activeRecord.slug}-${mode}`} {...screenTransition}>
+        <div className="screen-panel">
+          <div className="screen-heading">
+            <div>
+              <p className="eyebrow">Loaded dossier</p>
+              <h2>{activeRecord.displayName}</h2>
+            </div>
+            <div className="screen-meta">
+              <span>{formatType(activeRecord.entityType)}</span>
+              <span>{activeRecord.era}</span>
+            </div>
+          </div>
+          <div className="dossier-screen-layout">
+            <div className="dossier-screen-copy">
+              <div className="dossier-line">
+                <span className="lcars-badge">{activeMode.label}</span>
+                <span className="lcars-badge lcars-badge-soft">{activeRecord.canonTier} canon</span>
+              </div>
+              <p className="dossier-summary">{activeRecord.summary}</p>
+              <div className="tag-row">
+                {activeRecord.tags.map((tag) => (
+                  <span className="tag-pill" key={tag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="dossier-actions">
+                <button type="button" onClick={() => openMainScreen("relations")}>
+                  Open map
+                </button>
+                <button type="button" onClick={() => openMainScreen("timeline")}>
+                  Open timeline
+                </button>
+                <button type="button" onClick={() => dockCompare(activeRecord.slug === "vulcan-species" ? "romulan-species" : "vulcan-species")}>
+                  Dock alternate
+                </button>
+              </div>
+            </div>
+
+            <div className="dossier-screen-sidecar">
+              <div className="console-metric-grid">
+                <article className="console-metric-card">
+                  <span>Threat index</span>
+                  <strong>{formatThreat(activeRecord.threatLevel)}</strong>
+                </article>
+                <article className="console-metric-card">
+                  <span>Confidence</span>
+                  <strong>{formatConfidence(activeRecord.confidenceScore)}</strong>
+                </article>
+                <article className="console-metric-card">
+                  <span>Linked records</span>
+                  <strong>{activeRecord.relationTargets.length}</strong>
+                </article>
+                <article className="console-metric-card">
+                  <span>Source trail</span>
+                  <strong>{activeRecord.sourceTrail.length}</strong>
+                </article>
+              </div>
+              <div className="scan-spectrum" aria-hidden="true">
+                {scanBars.map((bar) => (
+                  <span className="scan-bar" key={bar.id} style={{ height: bar.height }} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="facts-ribbon">
+            {activeRecord.primaryFacts.slice(0, 4).map((fact) => (
+              <article className="fact-ribbon-card" key={fact.label}>
+                <span>{fact.label}</span>
+                <strong>{fact.value}</strong>
+              </article>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+    );
+  }
+
+  function renderSidePanel() {
+    if (sidePanel === "profile") {
+      return (
+        <motion.div className="side-panel-body" key={sidePanel} {...screenTransition}>
+          <div className="stack-list">
+            {Object.entries(activeRecord.profile).map(([label, value]) => (
+              <article className="side-row-card" key={label}>
+                <span>{formatLabel(label)}</span>
+                <strong>{value}</strong>
+              </article>
+            ))}
+            <article className="side-row-card">
+              <span>Diplomatic posture</span>
+              <strong>{activeRecord.diplomaticPosture}</strong>
+            </article>
+            <article className="side-row-card">
+              <span>Tags</span>
+              <div className="tag-row">
+                {activeRecord.tags.map((tag) => (
+                  <span className="tag-pill" key={tag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </article>
+          </div>
+        </motion.div>
+      );
+    }
+
+    if (sidePanel === "search") {
+      return (
+        <motion.div className="side-panel-body" key={sidePanel} {...screenTransition}>
+          <label className="search-shell">
+            <span>Archive jump</span>
+            <input
+              name="query"
+              type="text"
+              placeholder="Vulcan, Borg, Picard, Khitomer..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </label>
+          <div className="search-results">
+            {searchResults.length ? (
+              searchResults.map((result) => (
+                <article className="search-result-card" key={result.slug}>
+                  <button type="button" onClick={() => focusEntity(result.slug, "dossier")}>
+                    <strong>{result.displayName}</strong>
+                    <span>
+                      {result.entityType} / {result.canonTier}
+                    </span>
+                    <p>{result.summary}</p>
+                  </button>
+                  <div className="search-result-actions">
+                    <button type="button" onClick={() => dockCompare(result.slug)}>
+                      Dock
+                    </button>
+                    <button type="button" onClick={() => focusEntity(result.slug, "relations")}>
+                      Map
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <p className="screen-placeholder">
+                {query ? "No direct match in the current archive snapshot." : "Use archive jump for direct handoff."}
+              </p>
+            )}
+          </div>
+        </motion.div>
+      );
+    }
+
+    if (sidePanel === "launch") {
+      return (
+        <motion.div className="side-panel-body" key={sidePanel} {...screenTransition}>
+          <div className="launch-list">
+            {launchRecords.map((record) => (
+              <article className="launch-side-card" key={record.slug}>
+                <button type="button" onClick={() => focusEntity(record.slug, "dossier")}>
+                  <span>{record.entityType}</span>
+                  <strong>{record.displayName}</strong>
+                  <p>{record.summary}</p>
+                </button>
+                <div className="launch-side-actions">
+                  <button type="button" onClick={() => dockCompare(record.slug)}>
+                    Dock
+                  </button>
+                  <button type="button" onClick={() => focusEntity(record.slug, "relations")}>
+                    Map
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </motion.div>
+      );
+    }
+
+    return (
+      <motion.div className="side-panel-body" key={sidePanel} {...screenTransition}>
+        <article className="side-readout-card">
+          <p className="eyebrow">Mode readout</p>
+          <strong>{activeMode.label}</strong>
+          <p>{activeMode.summary}</p>
+        </article>
+        <article className="side-readout-card">
+          <p className="eyebrow">Operational notes</p>
+          <ul className="readout-list">
+            {activeRecord.readout.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </article>
+        <article className="side-readout-card">
+          <p className="eyebrow">Quick actions</p>
+          <div className="stack-buttons">
+            <button type="button" onClick={() => openMainScreen("relations")}>
+              Relation map
+            </button>
+            <button type="button" onClick={() => openMainScreen("timeline")}>
+              Era trail
+            </button>
+            <button type="button" onClick={() => setSidePanel("search")}>
+              Archive jump
+            </button>
+          </div>
+        </article>
+      </motion.div>
+    );
+  }
+
+  function renderLowerPanel() {
+    if (lowerPanel === "compare") {
+      return (
+        <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
+          {comparison ? (
+            <div className="lower-compare-grid">
+              {comparison.contrast.slice(0, 4).map((item) => (
+                <article className="lower-card" key={item.label}>
+                  <span>{item.label}</span>
+                  <strong>{comparison.left.displayName}</strong>
+                  <p>{item.left ?? "n/a"}</p>
+                  <strong>{comparison.right.displayName}</strong>
+                  <p>{item.right ?? "n/a"}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="screen-placeholder">Dock another dossier to activate the lower compare strip.</p>
+          )}
+        </motion.div>
+      );
+    }
+
+    if (lowerPanel === "sources") {
+      return (
+        <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
+          <div className="lower-source-grid">
+            {activeRecord.sourceTrail.map((source) => (
+              <article className="lower-card" key={source.key}>
+                <span>{source.label}</span>
+                <strong>{source.sourceType}</strong>
+                <div className="source-bar-track">
+                  <span className="source-bar-fill" style={{ width: `${Math.round(source.canonWeight * 100)}%` }} />
+                </div>
+              </article>
+            ))}
+          </div>
+        </motion.div>
+      );
+    }
+
+    if (lowerPanel === "launch") {
+      return (
+        <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
+          <div className="lower-launch-grid">
+            {launchRecords.map((record) => (
+              <article className="lower-card lower-launch-card" key={record.slug}>
+                <button type="button" onClick={() => focusEntity(record.slug, "dossier")}>
+                  <span>{record.entityType}</span>
+                  <strong>{record.displayName}</strong>
+                </button>
+                <div className="launch-side-actions">
+                  <button type="button" onClick={() => dockCompare(record.slug)}>
+                    Dock
+                  </button>
+                  <button type="button" onClick={() => focusEntity(record.slug, "timeline")}>
+                    Trail
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </motion.div>
+      );
+    }
+
+    return (
+      <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
+        <div className="lower-timeline-grid">
+          {activeRecord.timelineTrail.length ? (
+            activeRecord.timelineTrail.map((event) => (
+              <article className="lower-card" key={`${event.eraLabel}-${event.headline}`}>
+                <span>{event.eraLabel}</span>
+                <strong>{event.headline}</strong>
+                <p>{event.detail}</p>
+              </article>
+            ))
+          ) : (
+            <article className="lower-card">
+              <span>Archive gap</span>
+              <strong>No indexed timeline beats.</strong>
+              <p>Switch to relations or sources to keep navigating this dossier.</p>
+            </article>
+          )}
+        </div>
+      </motion.div>
+    );
   }
 
   return (
     <main className="archive-root">
       <ArchiveBackdrop />
-      <motion.div
-        className="archive-shell"
-        initial="hidden"
-        animate="show"
-        transition={{ staggerChildren: reducedMotion ? 0 : 0.06 }}
-      >
-        <motion.header className="archive-masthead" variants={revealVariant}>
-          <div className="masthead-kicker">
-            <span className="lcars-chip lcars-chip-primary">Federation archive link stable</span>
-            <span className="lcars-chip">stardate {stardate}</span>
-            <span className="lcars-chip">alpha quadrant touch wall</span>
+      <motion.div className="archive-shell" initial="hidden" animate="show" variants={shellVariant}>
+        <motion.header className="console-header panel-chrome" variants={panelVariant}>
+          <div className="console-id">
+            <div className="console-title-block">
+              <p className="eyebrow">LCARS access node</p>
+              <h1>Trek Field Guide</h1>
+            </div>
+            <p className="console-subline">
+              Federation archive wall for species, worlds, ships, factions, and treaty incidents. Touch any panel to retune the active screen.
+            </p>
           </div>
-          <div className="masthead-grid">
-            <div className="masthead-copy">
-              <p className="eyebrow">Trek Field Guide</p>
-              <h1>Federation field guide.</h1>
-              <p className="lede">
-                Species, worlds, ships, factions, and treaty flashpoints already loaded into a Federation
-                archive wall. Tap any dossier, follow the links, and keep moving.
-              </p>
-              <div className="masthead-highlights">
-                <article className="highlight-card">
-                  <span>Active dossier</span>
-                  <strong>{activeRecord.displayName}</strong>
-                  <p>{activeRecord.summary}</p>
-                </article>
-                <article className="highlight-card">
-                  <span>Compare dock</span>
-                  <strong>{compareRecord?.displayName ?? "Ready for pin"}</strong>
-                  <p>
-                    {compareRecord
-                      ? `Cross-checking ${compareRecord.entityType} signals and canon trail.`
-                      : "Pin a second subject from the launch deck or the relation web."}
-                  </p>
-                </article>
-                <article className="highlight-card">
-                  <span>Current lens</span>
-                  <strong>{activeMode.label}</strong>
-                  <p>{activeMode.summary}</p>
-                </article>
-              </div>
-            </div>
-            <div className="masthead-deck">
-              <div className="masthead-status">
-                {mastheadMetrics.map((metric) => (
-                  <article className="masthead-metric" key={metric.label}>
-                    <span>{metric.label}</span>
-                    <strong>{metric.value}</strong>
-                    <small>{metric.detail}</small>
-                    <div className="metric-band-track" aria-hidden="true">
-                      <span className="metric-band-fill" style={{ width: `${metric.fill}%` }} />
-                    </div>
-                  </article>
-                ))}
-              </div>
-              <section className="masthead-launch">
-                <div className="panel-head panel-head-tight">
-                  <p className="eyebrow">Launch subjects</p>
-                  <span>tap to load or dock</span>
-                </div>
-                <div className="launch-grid">
-                  {launchRecords.map((record) => (
-                    <article className="launch-card" key={record.slug}>
-                      <button
-                        className="launch-card-main"
-                        type="button"
-                        onClick={() => focusEntity(record.slug)}
-                      >
-                        <span>
-                          {record.entityType} / {record.era}
-                        </span>
-                        <strong>{record.displayName}</strong>
-                        <p>{record.summary}</p>
-                      </button>
-                      <div className="launch-card-footer">
-                        <span>{record.timelineTrail.at(-1)?.eraLabel ?? record.era}</span>
-                        <button type="button" onClick={() => dockCompare(record.slug)}>
-                          Dock
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            </div>
+          <div className="console-statusband">
+            <span className="lcars-chip lcars-chip-primary">archive link stable</span>
+            <span className="lcars-chip">stardate {stardate}</span>
+            <span className="lcars-chip">{activeRecord.displayName}</span>
+            <span className="lcars-chip">{activeMainScreen.label}</span>
+          </div>
+          <div className="console-topmetrics">
+            {topMetrics.map((metric) => (
+              <article className="topmetric-card" key={metric.label}>
+                <span>{metric.label}</span>
+                <strong>{metric.value}</strong>
+                <small>{metric.detail}</small>
+              </article>
+            ))}
           </div>
         </motion.header>
 
-        <div className="archive-frame">
-          <motion.aside className="control-rail" variants={revealVariant}>
-            <section className="rail-panel rail-panel-modes">
+        <motion.div className="lcars-workstation" variants={panelVariant}>
+          <aside className="lcars-rail panel-chrome">
+            <div className="rail-group">
               <div className="panel-head">
                 <p className="eyebrow">Modes</p>
                 <span>{activeMode.code}</span>
@@ -265,7 +799,7 @@ export function FieldGuideApp() {
                     className={clsx("mode-button", mode === entry.id && "is-active")}
                     key={entry.id}
                     type="button"
-                    onClick={() => setMode(entry.id)}
+                    onClick={() => changeMode(entry.id)}
                   >
                     <span>{entry.code}</span>
                     <strong>{entry.label}</strong>
@@ -273,392 +807,120 @@ export function FieldGuideApp() {
                   </button>
                 ))}
               </div>
-            </section>
+            </div>
 
-            <section className="rail-panel rail-panel-search">
+            <div className="rail-group">
               <div className="panel-head">
-                <p className="eyebrow">Archive Jump</p>
-                <span>Search by name or alias</span>
-              </div>
-              <label className="search-shell">
-                <span>Target</span>
-                <input
-                  name="query"
-                  type="text"
-                  placeholder="Vulcan, Borg, Picard, Khitomer..."
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                />
-              </label>
-              <div className="search-results">
-                {searchResults.length ? (
-                  searchResults.map((result) => (
-                    <article className="search-result-card" key={result.slug}>
-                      <button type="button" onClick={() => focusEntity(result.slug)}>
-                        <strong>{result.displayName}</strong>
-                        <span>
-                          {result.entityType} / {result.canonTier}
-                        </span>
-                        <p>{result.summary}</p>
-                      </button>
-                      <div className="search-result-actions">
-                        <button type="button" onClick={() => dockCompare(result.slug)}>
-                          Compare
-                        </button>
-                      </div>
-                    </article>
-                  ))
-                ) : (
-                  <p className="search-placeholder">
-                    {query
-                      ? "No direct match in the current archive snapshot."
-                      : "The wall is already live. Use archive jump when you want a direct handoff."}
-                  </p>
-                )}
-              </div>
-            </section>
-
-            <section className="rail-panel rail-panel-sections">
-              <div className="panel-head">
-                <p className="eyebrow">Archive Strata</p>
-                <span>Tap to retune the deck</span>
+                <p className="eyebrow">Archive strata</p>
+                <span>{activeSection === "all" ? "featured" : activeSection}</span>
               </div>
               <div className="section-grid">
                 <button
                   className={clsx("section-card", activeSection === "all" && "is-active")}
                   type="button"
-                  onClick={() => setActiveSection("all")}
+                  onClick={() => retuneSection("all", featuredRecords[0]?.slug)}
                 >
                   <strong>Featured</strong>
-                  <span>Curated launch subjects</span>
+                  <span>Launch records</span>
                 </button>
                 {archiveSections.map((section) => (
                   <button
                     className={clsx("section-card", activeSection === section.type && "is-active")}
                     key={section.type}
                     type="button"
-                    onClick={() => {
-                      setActiveSection(section.type);
-                      focusEntity(section.leadSlug);
-                    }}
+                    onClick={() => retuneSection(section.type, section.leadSlug)}
                   >
                     <strong>{section.label}</strong>
-                    <span>{section.count} indexed records</span>
+                    <span>{section.count} records</span>
                   </button>
                 ))}
               </div>
-            </section>
-          </motion.aside>
-
-          <div className="guide-stage">
-            <motion.section className="stage-top-grid" variants={revealVariant}>
-              <AnimatePresence mode="wait">
-                <motion.article
-                  className="dossier-panel"
-                  initial={{ opacity: 0, y: 28 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -18 }}
-                  key={`${activeRecord.slug}-${mode}`}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <div className="panel-head">
-                    <p className="eyebrow">Loaded Record</p>
-                    <span>
-                      {activeRecord.entityType} / {activeRecord.era}
-                    </span>
-                  </div>
-                  <div className="dossier-grid">
-                    <div className="dossier-copy">
-                      <div className="dossier-line">
-                        <span className="lcars-badge">{activeMode.label}</span>
-                        <span className="lcars-badge lcars-badge-soft">{activeRecord.canonTier} canon</span>
-                      </div>
-                      <h2>{activeRecord.displayName}</h2>
-                      <p className="dossier-summary">{activeRecord.summary}</p>
-                      <div className="tag-row">
-                        {activeRecord.tags.map((tag) => (
-                          <span className="tag-pill" key={tag}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="dossier-actions">
-                        {relatedTargets.slice(0, 2).map((target) => (
-                          <button key={target.slug} type="button" onClick={() => focusEntity(target.slug)}>
-                            Open {target.displayName}
-                          </button>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => dockCompare(activeRecord.slug === "vulcan-species" ? "romulan-species" : "vulcan-species")}
-                        >
-                          Dock alternate
-                        </button>
-                      </div>
-                    </div>
-                    <div className="dossier-sidecar">
-                      <div className="metric-grid">
-                        <article className="metric-card">
-                          <span>Threat index</span>
-                          <strong>{formatThreat(activeRecord.threatLevel)}</strong>
-                        </article>
-                        <article className="metric-card">
-                          <span>Archive confidence</span>
-                          <strong>{formatConfidence(activeRecord.confidenceScore)}</strong>
-                        </article>
-                        <article className="metric-card">
-                          <span>Linked records</span>
-                          <strong>{activeRecord.relationTargets.length}</strong>
-                        </article>
-                        <article className="metric-card">
-                          <span>Source trail</span>
-                          <strong>{activeRecord.sourceTrail.length}</strong>
-                        </article>
-                      </div>
-
-                      <div className="scan-spectrum" aria-hidden="true">
-                        {scanBars.map((bar) => (
-                          <span className="scan-bar" key={bar.id} style={{ height: bar.height }} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.article>
-              </AnimatePresence>
-
-              <article className="support-panel">
-                <div className="panel-head">
-                  <p className="eyebrow">Guide Lens</p>
-                  <span>{activeMode.code}</span>
-                </div>
-                <div className="support-copy">
-                  <h3>{activeMode.label} lens</h3>
-                  <p>{activeMode.summary}</p>
-                </div>
-                <div className="support-list">
-                  {Object.entries(activeRecord.profile).map(([label, value]) => (
-                    <article className="support-row" key={label}>
-                      <span>{label.replace(/([A-Z])/g, " $1")}</span>
-                      <strong>{value}</strong>
-                    </article>
-                  ))}
-                </div>
-                <div className="support-compare">
-                  <div className="panel-head panel-head-tight">
-                    <p className="eyebrow">Compare Dock</p>
-                    <span>{compareRecord ? compareRecord.displayName : "Empty"}</span>
-                  </div>
-                  {compareRecord ? (
-                    <div className="compare-dock-card">
-                      <strong>{compareRecord.displayName}</strong>
-                      <p>{compareRecord.summary}</p>
-                      <div className="dock-actions">
-                        <button type="button" onClick={() => focusEntity(compareRecord.slug)}>
-                          Open target
-                        </button>
-                        <button type="button" onClick={() => setCompareSlug(null)}>
-                          Clear dock
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="search-placeholder">
-                      Tap the plus chip on relation nodes or use a search result to dock a second dossier.
-                    </p>
-                  )}
-                </div>
-              </article>
-            </motion.section>
-
-            <div className="stage-grid">
-              <motion.section className="stage-panel orbit-panel" variants={revealVariant}>
-                <div className="panel-head">
-                  <p className="eyebrow">Relation Web</p>
-                  <span>tap nodes to jump or dock</span>
-                </div>
-                <RelationOrbit
-                  compareSlug={compareSlug}
-                  entity={activeRecord}
-                  onCompare={dockCompare}
-                  onSelect={focusEntity}
-                />
-              </motion.section>
-
-              <motion.section className="stage-panel facts-panel" variants={revealVariant}>
-                <div className="panel-head">
-                  <p className="eyebrow">Operational Readout</p>
-                  <span>{activeRecord.primaryFacts.length} ranked facts</span>
-                </div>
-                <div className="facts-layout">
-                  <div className="readout-card">
-                    <h3>Mode-specific readout</h3>
-                    <ul>
-                      {activeRecord.readout.map((line) => (
-                        <li key={line}>{line}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="facts-stack">
-                    {activeRecord.primaryFacts.map((fact) => (
-                      <article className="fact-card" key={fact.label}>
-                        <span>{fact.label}</span>
-                        <strong>{fact.value}</strong>
-                        <small>{fact.source?.label ?? "Source pending"}</small>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              </motion.section>
-
-              <motion.section className="stage-panel timeline-panel" variants={revealVariant}>
-                <div className="panel-head">
-                  <p className="eyebrow">Timeline Trail</p>
-                  <span>{activeRecord.timelineTrail.length || 1} sequence nodes</span>
-                </div>
-                <div className="timeline-stack">
-                  {activeRecord.timelineTrail.length ? (
-                    activeRecord.timelineTrail.map((event, index) => (
-                      <motion.article
-                        className="timeline-card"
-                        key={`${event.eraLabel}-${event.headline}`}
-                        initial={{ opacity: 0, x: -18 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.35, delay: index * 0.06 }}
-                      >
-                        <span>{event.eraLabel}</span>
-                        <strong>{event.headline}</strong>
-                        <p>{event.detail}</p>
-                      </motion.article>
-                    ))
-                  ) : (
-                    <article className="timeline-card timeline-card-empty">
-                      <span>Archive gap</span>
-                      <strong>No discrete timeline events in the current snapshot.</strong>
-                      <p>The field guide still carries this entity as an anchor record through relations and facts.</p>
-                    </article>
-                  )}
-                </div>
-              </motion.section>
-
-              <motion.section className="stage-panel sources-panel" variants={revealVariant}>
-                <div className="panel-head">
-                  <p className="eyebrow">Source Trail</p>
-                  <span>confidence weighted</span>
-                </div>
-                <div className="source-stack">
-                  {activeRecord.sourceTrail.map((source) => (
-                    <article className="source-card" key={source.key}>
-                      <div className="source-head">
-                        <strong>{source.label}</strong>
-                        <span>{source.sourceType}</span>
-                      </div>
-                      <div className="source-bar-track">
-                        <span className="source-bar-fill" style={{ width: `${Math.round(source.canonWeight * 100)}%` }} />
-                      </div>
-                      <small>{Math.round(source.canonWeight * 100)}% trust weighting</small>
-                    </article>
-                  ))}
-                  <div className="source-legend">
-                    {sourceRecords.map((source) => (
-                      <span key={source.key}>{source.label}</span>
-                    ))}
-                  </div>
-                </div>
-              </motion.section>
-
-              <motion.section className="stage-panel compare-panel" variants={revealVariant}>
-                <div className="panel-head">
-                  <p className="eyebrow">Compare Deck</p>
-                  <span>{comparison ? `${comparison.left.displayName} vs ${comparison.right.displayName}` : "dock another record"}</span>
-                </div>
-                {comparison ? (
-                  <div className="compare-layout">
-                    <div className="compare-summary-grid">
-                      <article className="compare-summary-card">
-                        <span>{comparison.left.entityType}</span>
-                        <strong>{comparison.left.displayName}</strong>
-                        <p>{comparison.left.summary}</p>
-                      </article>
-                      <article className="compare-summary-card">
-                        <span>{comparison.right.entityType}</span>
-                        <strong>{comparison.right.displayName}</strong>
-                        <p>{comparison.right.summary}</p>
-                      </article>
-                    </div>
-
-                    <div className="compare-columns">
-                      <article className="compare-column">
-                        <h3>Shared</h3>
-                        {comparison.shared.length ? (
-                          <ul>
-                            {comparison.shared.map((item) => (
-                              <li key={item.label}>
-                                <strong>{item.label}</strong>
-                                <span>{item.left}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="search-placeholder">No shared high-weight facts in the current compare window.</p>
-                        )}
-                      </article>
-                      <article className="compare-column">
-                        <h3>Contrast</h3>
-                        {comparison.contrast.length ? (
-                          <ul>
-                            {comparison.contrast.map((item) => (
-                              <li key={item.label}>
-                                <strong>{item.label}</strong>
-                                <span>{comparison.left.displayName}: {item.left ?? "n/a"}</span>
-                                <span>{comparison.right.displayName}: {item.right ?? "n/a"}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="search-placeholder">No meaningful contrasts surfaced yet.</p>
-                        )}
-                      </article>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="empty-compare-state">
-                    <p>Dock a second dossier to light up the compare grid.</p>
-                    <div className="dock-actions">
-                      {relatedTargets.map((target) => (
-                        <button key={target.slug} type="button" onClick={() => dockCompare(target.slug)}>
-                          Compare {target.displayName}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </motion.section>
-
-              <motion.section className="stage-panel browse-panel" variants={revealVariant}>
-                <div className="panel-head">
-                  <p className="eyebrow">Launch Deck</p>
-                  <span>{activeSection === "all" ? "featured records" : `${activeSection} deck`}</span>
-                </div>
-                <div className="browse-grid">
-                  {browseRecords.map((record) => (
-                    <article className="browse-card" key={record.slug}>
-                      <button type="button" onClick={() => focusEntity(record.slug)}>
-                        <span>{record.entityType}</span>
-                        <strong>{record.displayName}</strong>
-                        <p>{record.summary}</p>
-                      </button>
-                      <div className="browse-card-actions">
-                        <button type="button" onClick={() => dockCompare(record.slug)}>
-                          Dock compare
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </motion.section>
             </div>
-          </div>
-        </div>
+          </aside>
+
+          <section className="lcars-core panel-chrome">
+            <div className="console-pane-header">
+              <div>
+                <p className="eyebrow">Active screen</p>
+                <div className="active-stamp">
+                  <strong>{activeRecord.displayName}</strong>
+                  <span>
+                    {formatType(activeRecord.entityType)} / {activeRecord.era}
+                  </span>
+                </div>
+              </div>
+              <div className="screen-tabbar">
+                {screenDeck.map((entry) => (
+                  <button
+                    className={clsx("tab-button", mainScreen === entry.id && "is-active")}
+                    key={entry.id}
+                    type="button"
+                    onClick={() => openMainScreen(entry.id)}
+                  >
+                    <span>{entry.code}</span>
+                    <strong>{entry.label}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="console-pane-body">
+              <AnimatePresence mode="wait" initial={false}>
+                {renderMainScreen()}
+              </AnimatePresence>
+            </div>
+          </section>
+
+          <aside className="lcars-aux panel-chrome">
+            <div className="panel-head">
+              <p className="eyebrow">Auxiliary</p>
+              <span>{sidePanel}</span>
+            </div>
+            <div className="aux-tabbar">
+              {sideDeck.map((entry) => (
+                <button
+                  className={clsx("aux-button", sidePanel === entry.id && "is-active")}
+                  key={entry.id}
+                  type="button"
+                  onClick={() => setSidePanel(entry.id)}
+                >
+                  {entry.label}
+                </button>
+              ))}
+            </div>
+            <div className="aux-panel-scroll">
+              <AnimatePresence mode="wait" initial={false}>
+                {renderSidePanel()}
+              </AnimatePresence>
+            </div>
+          </aside>
+
+          <section className="lcars-lower panel-chrome">
+            <div className="lower-header">
+              <div className="panel-head panel-head-tight">
+                <p className="eyebrow">Lower strip</p>
+                <span>{lowerPanel}</span>
+              </div>
+              <div className="lower-tabbar">
+                {lowerDeck.map((entry) => (
+                  <button
+                    className={clsx("lower-button", lowerPanel === entry.id && "is-active")}
+                    key={entry.id}
+                    type="button"
+                    onClick={() => setLowerPanel(entry.id)}
+                  >
+                    {entry.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="lower-panel-scroll">
+              <AnimatePresence mode="wait" initial={false}>
+                {renderLowerPanel()}
+              </AnimatePresence>
+            </div>
+          </section>
+        </motion.div>
       </motion.div>
     </main>
   );
