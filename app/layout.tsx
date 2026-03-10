@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Antonio, IBM_Plex_Sans, Space_Mono } from "next/font/google";
+import "./lcars-vendor.css";
 import "./globals.css";
 
 const display = Antonio({
