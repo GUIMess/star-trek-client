@@ -48,13 +48,6 @@ button {
   overflow: hidden;
 }
 
-.archive-stage {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  min-height: 0;
-}
-
 .archive-shell {
   position: relative;
   z-index: 1;
@@ -2561,34 +2554,5 @@ body {
 
   .mode-button small {
     -webkit-line-clamp: 3;
-  }
-}
-
-@media (min-width: 1361px) and (min-height: 821px) {
-  .archive-root.is-fitted {
-    display: grid;
-    align-content: start;
-    justify-items: center;
-  }
-
-  .archive-stage.is-fitted {
-    width: var(--archive-fit-width, 100%);
-    height: var(--archive-fit-height, auto);
-    flex: 0 0 auto;
-  }
-
-  .archive-stage.is-fitted .archive-shell {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 1480px;
-    height: 900px;
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 0.28rem 0 0.22rem;
-    transform: scale(var(--archive-fit-scale, 1));
-    transform-origin: top left;
-    will-change: transform;
   }
 }

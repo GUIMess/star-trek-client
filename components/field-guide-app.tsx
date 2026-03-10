@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
-import { startTransition, useDeferredValue, useEffect, useState, type CSSProperties } from "react";
+import { startTransition, useDeferredValue, useEffect, useState } from "react";
 import { ArchiveBackdrop } from "./archive-backdrop";
 import { CartographyPlate } from "./cartography-plate";
 import { RelationOrbit } from "./relation-orbit";
@@ -77,11 +77,6 @@ const lowerDeck: Array<{ id: LowerPanel; label: string }> = [
   { id: "sources", label: "Sources" },
   { id: "launch", label: "Launch" },
 ];
-
-const DESKTOP_STAGE_WIDTH = 1480;
-const DESKTOP_STAGE_HEIGHT = 900;
-const DESKTOP_STAGE_BREAKPOINT = 1360;
-const DESKTOP_STAGE_MIN_HEIGHT = 820;
 
 function formatThreat(value: string) {
   if (!value || value === "n/a") return "Context specific";
@@ -163,12 +158,6 @@ export function FieldGuideApp() {
   const [compareSlug, setCompareSlug] = useState<string | null>(defaultCompareSlug);
   const [query, setQuery] = useState("");
   const [stardate, setStardate] = useState(buildStardate());
-  const [desktopStage, setDesktopStage] = useState({
-    enabled: false,
-    scale: 1,
-    width: 0,
-    height: 0,
-  });
   const deferredQuery = useDeferredValue(query);
 
   useEffect(() => {
@@ -176,52 +165,6 @@ export function FieldGuideApp() {
     update();
     const interval = window.setInterval(update, 60_000);
     return () => window.clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const updateDesktopStage = () => {
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const enableFit = viewportWidth > DESKTOP_STAGE_BREAKPOINT && viewportHeight > DESKTOP_STAGE_MIN_HEIGHT;
-
-      if (!enableFit) {
-        setDesktopStage((current) => (
-          current.enabled
-            ? { enabled: false, scale: 1, width: 0, height: 0 }
-            : current
-        ));
-        return;
-      }
-
-      const gutterX = Math.max(10, Math.round(viewportWidth * 0.012));
-      const gutterY = Math.max(10, Math.round(viewportHeight * 0.012));
-      const availableWidth = Math.max(viewportWidth - gutterX * 2, 320);
-      const availableHeight = Math.max(viewportHeight - gutterY * 2, 320);
-      const scale = Math.min(
-        availableWidth / DESKTOP_STAGE_WIDTH,
-        availableHeight / DESKTOP_STAGE_HEIGHT,
-        1
-      );
-      const next = {
-        enabled: true,
-        scale: Number(scale.toFixed(4)),
-        width: Math.round(DESKTOP_STAGE_WIDTH * scale),
-        height: Math.round(DESKTOP_STAGE_HEIGHT * scale),
-      };
-
-      setDesktopStage((current) => (
-        current.enabled === next.enabled &&
-        current.scale === next.scale &&
-        current.width === next.width &&
-        current.height === next.height
-          ? current
-          : next
-      ));
-    };
-
-    updateDesktopStage();
-    window.addEventListener("resize", updateDesktopStage);
-    return () => window.removeEventListener("resize", updateDesktopStage);
   }, []);
 
   const activeRecord = getHydratedEntity(activeSlug, mode) ?? featuredRecords[0];
@@ -242,11 +185,6 @@ export function FieldGuideApp() {
   const scanBars = buildScanBars(activeRecord.primaryFacts);
   const activeMode = modeDeck.find((entry) => entry.id === mode) ?? modeDeck[0];
   const activeMainScreen = screenDeck.find((entry) => entry.id === mainScreen) ?? screenDeck[0];
-  const desktopStageStyle = desktopStage.enabled ? ({
-    "--archive-fit-scale": String(desktopStage.scale),
-    "--archive-fit-width": `${desktopStage.width}px`,
-    "--archive-fit-height": `${desktopStage.height}px`,
-  } as CSSProperties) : undefined;
 
   const topMetrics = [
     { label: "Archive", value: archiveStats.entityCount, detail: "indexed records" },
@@ -937,10 +875,9 @@ export function FieldGuideApp() {
   }
 
   return (
-    <main className={clsx("archive-root", desktopStage.enabled && "is-fitted")} style={desktopStageStyle}>
+    <main className="archive-root">
       <ArchiveBackdrop />
-      <div className={clsx("archive-stage", desktopStage.enabled && "is-fitted")}>
-        <motion.div className="archive-shell" initial="hidden" animate="show" variants={shellVariant}>
+      <motion.div className="archive-shell" initial="hidden" animate="show" variants={shellVariant}>
           <motion.header className="console-header panel-chrome" variants={panelVariant}>
             <div className="console-id">
               <div className="console-title-block">
@@ -1103,8 +1040,7 @@ export function FieldGuideApp() {
               </div>
             </section>
           </motion.div>
-        </motion.div>
-      </div>
+      </motion.div>
     </main>
   );
 }
