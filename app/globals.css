@@ -2406,7 +2406,7 @@ body {
   scrollbar-color: rgba(243, 181, 107, 0.42) transparent;
 }
 
-@media (max-width: 1360px) {
+@media (max-width: 1360px), (max-height: 820px) {
   .archive-root {
     --lcars-rail-col: clamp(10.25rem, 16vw, 11.75rem);
     --lcars-aux-col: clamp(11.75rem, 18vw, 13.25rem);
@@ -2564,7 +2564,7 @@ body {
   }
 }
 
-@media (min-width: 1361px) {
+@media (min-width: 1361px) and (min-height: 821px) {
   .archive-root.is-fitted {
     display: grid;
     align-content: start;

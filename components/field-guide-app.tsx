@@ -81,6 +81,7 @@ const lowerDeck: Array<{ id: LowerPanel; label: string }> = [
 const DESKTOP_STAGE_WIDTH = 1480;
 const DESKTOP_STAGE_HEIGHT = 900;
 const DESKTOP_STAGE_BREAKPOINT = 1360;
+const DESKTOP_STAGE_MIN_HEIGHT = 820;
 
 function formatThreat(value: string) {
   if (!value || value === "n/a") return "Context specific";
@@ -181,7 +182,7 @@ export function FieldGuideApp() {
     const updateDesktopStage = () => {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const enableFit = viewportWidth > DESKTOP_STAGE_BREAKPOINT;
+      const enableFit = viewportWidth > DESKTOP_STAGE_BREAKPOINT && viewportHeight > DESKTOP_STAGE_MIN_HEIGHT;
 
       if (!enableFit) {
         setDesktopStage((current) => (
