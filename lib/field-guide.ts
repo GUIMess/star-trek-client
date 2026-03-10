@@ -1,4 +1,5 @@
 import MiniSearch from "minisearch";
+import enrichment from "../data/archive-enrichment.json";
 import seed from "../data/seed.json";
 
 export type ArchiveMode = "field-guide" | "first-contact" | "diplomatic" | "threat";
@@ -37,6 +38,38 @@ export type GuideTimelineEvent = {
   sourceKey: string;
 };
 
+export type GuideBioSection = {
+  heading: string;
+  body: string;
+};
+
+export type GuideMediaAsset = {
+  id: string;
+  kind: "portrait" | "gallery";
+  title: string;
+  src: string;
+  alt: string;
+  caption: string;
+  credit: string | null;
+  sourceKey: string;
+};
+
+export type GuideCitation = {
+  label: string;
+  url: string;
+  note: string;
+  sourceKey: string;
+};
+
+export type GuideCartography = {
+  quadrant: string;
+  sector: string;
+  gridLabel: string;
+  rangeLabel: string;
+  x: number;
+  y: number;
+};
+
 export type GuideEntity = {
   slug: string;
   displayName: string;
@@ -68,7 +101,18 @@ export type HydratedFact = GuideFact & {
   source: GuideSource | null;
 };
 
+export type HydratedCitation = GuideCitation & {
+  source: GuideSource | null;
+};
+
 export type HydratedEntity = GuideEntity & {
+  descriptor: string | null;
+  bioSections: GuideBioSection[];
+  media: GuideMediaAsset[];
+  primaryMedia: GuideMediaAsset | null;
+  galleryMedia: GuideMediaAsset[];
+  citations: HydratedCitation[];
+  cartography: GuideCartography | null;
   confidenceScore: number;
   sourceTrail: GuideSource[];
   primaryFacts: HydratedFact[];
@@ -82,10 +126,61 @@ type SeedRecord = {
   entities: GuideEntity[];
 };
 
+type EnrichmentRecord = {
+  generatedAt: string;
+  entities: Record<
+    string,
+    {
+      descriptor: string | null;
+      bioSections: GuideBioSection[];
+      media: GuideMediaAsset[];
+      citations: GuideCitation[];
+      cartography: GuideCartography | null;
+    }
+  >;
+};
+
 const archive = seed as unknown as SeedRecord;
+const archiveEnrichment = enrichment as EnrichmentRecord;
 const typeOrder = ["species", "person", "ship", "faction", "world", "event", "collective"];
-const sourceMap = new Map(archive.sources.map((source) => [source.key, source]));
+const supplementalSources: GuideSource[] = [
+  {
+    key: "wikipedia",
+    label: "Wikipedia",
+    sourceType: "encyclopedia",
+    url: "https://en.wikipedia.org/wiki/Main_Page",
+    canonWeight: 0.7,
+  },
+  {
+    key: "wikidata",
+    label: "Wikidata",
+    sourceType: "structured",
+    url: "https://www.wikidata.org/",
+    canonWeight: 0.64,
+  },
+  {
+    key: "wikimedia-commons",
+    label: "Wikimedia Commons",
+    sourceType: "media",
+    url: "https://commons.wikimedia.org/",
+    canonWeight: 0.76,
+  },
+];
+const allSources = [...archive.sources, ...supplementalSources.filter((source) => !archive.sources.some((entry) => entry.key === source.key))];
+const sourceMap = new Map(allSources.map((source) => [source.key, source]));
 const entityMap = new Map(archive.entities.map((entity) => [entity.slug, entity]));
+
+function getEnrichment(slug: string) {
+  return (
+    archiveEnrichment.entities[slug] ?? {
+      descriptor: null,
+      bioSections: [],
+      media: [],
+      citations: [],
+      cartography: null,
+    }
+  );
+}
 
 function average(values: number[]) {
   if (!values.length) return 0;
@@ -150,10 +245,13 @@ function buildReadout(entity: GuideEntity, mode: ArchiveMode) {
 
 function uniqueSources(entity: GuideEntity) {
   const keys = new Set<string>();
+  const details = getEnrichment(entity.slug);
   const ordered = [
     ...entity.facts.map((fact) => fact.sourceKey),
     ...entity.relationships.map((relationship) => relationship.sourceKey),
     ...entity.timeline.map((event) => event.sourceKey),
+    ...details.media.map((asset) => asset.sourceKey),
+    ...details.citations.map((citation) => citation.sourceKey),
   ];
 
   return ordered
@@ -180,9 +278,22 @@ export function getEntity(slug: string) {
 export function getHydratedEntity(slug: string, mode: ArchiveMode = "field-guide"): HydratedEntity | null {
   const entity = getEntity(slug);
   if (!entity) return null;
+  const details = getEnrichment(slug);
+  const media = details.media;
+  const citations = details.citations.map((citation) => ({
+    ...citation,
+    source: sourceMap.get(citation.sourceKey) ?? null,
+  }));
 
   return {
     ...entity,
+    descriptor: details.descriptor,
+    bioSections: details.bioSections,
+    media,
+    primaryMedia: media[0] ?? null,
+    galleryMedia: media.slice(1),
+    citations,
+    cartography: details.cartography,
     confidenceScore: confidenceScore(entity),
     sourceTrail: uniqueSources(entity),
     primaryFacts: byImportance(entity.facts)
@@ -248,6 +359,7 @@ type SearchDocument = {
   displayName: string;
   entityType: string;
   summary: string;
+  bio: string;
   canonTier: string;
   threatLevel: string;
   aliases: string;
@@ -256,7 +368,7 @@ type SearchDocument = {
 
 const searchIndex = new MiniSearch<SearchDocument>({
   idField: "slug",
-  fields: ["displayName", "aliases", "summary", "tags", "entityType"],
+  fields: ["displayName", "aliases", "summary", "bio", "tags", "entityType"],
   storeFields: ["slug", "displayName", "entityType", "summary", "canonTier", "threatLevel"],
   searchOptions: {
     boost: {
@@ -271,16 +383,20 @@ const searchIndex = new MiniSearch<SearchDocument>({
 });
 
 searchIndex.addAll(
-  archive.entities.map((entity) => ({
-    slug: entity.slug,
-    displayName: entity.displayName,
-    entityType: entity.entityType,
-    summary: entity.summary,
-    canonTier: entity.canonTier,
-    threatLevel: entity.threatLevel,
-    aliases: entity.aliases.join(" "),
-    tags: entity.tags.join(" "),
-  }))
+  archive.entities.map((entity) => {
+    const details = getEnrichment(entity.slug);
+    return {
+      slug: entity.slug,
+      displayName: entity.displayName,
+      entityType: entity.entityType,
+      summary: entity.summary,
+      bio: details.bioSections.map((section) => section.body).join(" "),
+      canonTier: entity.canonTier,
+      threatLevel: entity.threatLevel,
+      aliases: entity.aliases.join(" "),
+      tags: entity.tags.join(" "),
+    };
+  })
 );
 
 export function searchArchive(query: string) {
@@ -309,9 +425,11 @@ export const defaultCompareSlug = "romulan-species";
 
 export const archiveStats = {
   entityCount: archive.entities.length,
-  sourceCount: archive.sources.length,
+  sourceCount: allSources.length,
   relationCount: archive.entities.reduce((sum, entity) => sum + entity.relationships.length, 0),
   timelineCount: archive.entities.reduce((sum, entity) => sum + entity.timeline.length, 0),
+  mediaCount: Object.values(archiveEnrichment.entities).reduce((sum, entity) => sum + entity.media.length, 0),
+  citationCount: Object.values(archiveEnrichment.entities).reduce((sum, entity) => sum + entity.citations.length, 0),
 };
 
 export const archiveSections = typeOrder
@@ -333,7 +451,7 @@ export const featuredRecords = featuredSlugs
   .map((slug) => getHydratedEntity(slug))
   .filter((entity): entity is HydratedEntity => entity !== null);
 
-export const sourceRecords = archive.sources;
+export const sourceRecords = allSources;
 
 export function listEntitiesByType(type: string | "all") {
   if (type === "all") {

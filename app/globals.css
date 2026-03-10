@@ -234,8 +234,13 @@ button {
 .timeline-screen-card p,
 .map-legend-row p,
 .side-readout-card p,
+.side-row-card p,
 .lower-card p,
-.dossier-summary {
+.dossier-summary,
+.dossier-bio-snippet,
+.citation-card p,
+.cartography-copy p,
+.dossier-media-copy p {
   color: var(--text-muted);
   line-height: 1.55;
 }
@@ -491,11 +496,14 @@ button {
 .search-result-actions button,
 .launch-side-actions button,
 .stack-buttons button,
-.lower-launch-card button {
+.lower-launch-card button,
+.citation-card a,
+.citation-lower-card a {
   padding: 0.48rem 0.8rem;
   border-radius: 999px;
   background: rgba(122, 233, 207, 0.14);
   color: var(--text);
+  text-decoration: none;
 }
 
 .dossier-screen-layout,
@@ -512,6 +520,112 @@ button {
 .map-screen-layout {
   grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.72fr);
   min-height: 0;
+}
+
+.dossier-screen-copy,
+.dossier-screen-sidecar {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+}
+
+.dossier-bio-snippet {
+  margin: 0;
+}
+
+.dossier-media-card,
+.side-media-card,
+.citation-card,
+.cartography-plate {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 1.6rem;
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.dossier-media-card,
+.side-media-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.8rem;
+}
+
+.dossier-media-frame,
+.side-media-frame,
+.media-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(243, 181, 107, 0.08), rgba(114, 200, 255, 0.06)),
+    rgba(0, 0, 0, 0.18);
+}
+
+.dossier-media-frame {
+  aspect-ratio: 1.12;
+}
+
+.side-media-frame {
+  aspect-ratio: 1.2;
+}
+
+.dossier-media-frame::after,
+.side-media-frame::after,
+.media-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.34));
+  pointer-events: none;
+}
+
+.dossier-media-frame img,
+.side-media-frame img,
+.media-stage img,
+.media-thumb img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.dossier-media-frame-empty {
+  min-height: 12rem;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(122, 233, 207, 0.16), transparent 24%),
+    radial-gradient(circle at 74% 70%, rgba(243, 181, 107, 0.16), transparent 26%),
+    rgba(255, 255, 255, 0.03);
+}
+
+.dossier-media-copy,
+.side-media-copy,
+.media-caption {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.dossier-media-copy span,
+.side-media-copy span,
+.media-caption strong,
+.citation-card span,
+.cartography-head span,
+.cartography-node-row span {
+  color: var(--text-faint);
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.dossier-media-copy strong,
+.side-media-copy strong,
+.cartography-copy strong,
+.citation-card strong,
+.citation-lower-card strong {
+  font-family: var(--font-display), sans-serif;
+  text-transform: uppercase;
 }
 
 .console-metric-grid,
@@ -650,6 +764,136 @@ button {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--mint), var(--sky));
+}
+
+.sources-screen-grid-rich {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-content: start;
+}
+
+.media-screen-card,
+.citation-screen-card {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.media-stage {
+  min-height: 16rem;
+  padding: 0.35rem;
+}
+
+.media-stage-empty {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.media-thumb-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.media-thumb {
+  margin: 0;
+  aspect-ratio: 1.1;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.citation-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.citation-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: end;
+  padding: 0.85rem 0.95rem;
+}
+
+.citation-card strong,
+.citation-lower-card strong {
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.citation-lower-card {
+  display: grid;
+  gap: 0.45rem;
+  align-content: start;
+}
+
+.cartography-plate {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.85rem 0.95rem;
+}
+
+.cartography-stage {
+  position: relative;
+  min-height: 14rem;
+  border-radius: 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(transparent 95%, rgba(255, 255, 255, 0.04) 100%),
+    linear-gradient(90deg, transparent 95%, rgba(255, 255, 255, 0.04) 100%),
+    radial-gradient(circle at 30% 26%, rgba(114, 200, 255, 0.1), transparent 28%),
+    rgba(255, 255, 255, 0.025);
+  background-size: 100% 2.2rem, 2.2rem 100%, auto, auto;
+  overflow: hidden;
+}
+
+.cartography-stage svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cartography-line {
+  stroke: rgba(114, 200, 255, 0.36);
+  stroke-width: 1;
+  stroke-dasharray: 5 6;
+  animation: relation-dash 18s linear infinite;
+}
+
+.cartography-node circle {
+  fill: rgba(122, 233, 207, 0.88);
+  stroke: rgba(255, 255, 255, 0.65);
+  stroke-width: 0.8;
+}
+
+.cartography-node-active circle {
+  fill: var(--apricot);
+  filter: drop-shadow(0 0 10px rgba(243, 181, 107, 0.8));
+}
+
+.cartography-head,
+.cartography-node-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cartography-node-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cartography-node-row {
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cartography-node-row strong {
+  font-family: var(--font-display), sans-serif;
+  text-transform: uppercase;
 }
 
 .compare-hero-card {
@@ -829,6 +1073,10 @@ button {
     grid-template-columns: 1fr 1fr;
   }
 
+  .sources-screen-grid-rich {
+    grid-template-columns: 1fr;
+  }
+
   .lcars-workstation {
     grid-template-columns: 15rem minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) 16rem 16rem;
@@ -879,6 +1127,7 @@ button {
   .facts-ribbon,
   .timeline-screen-grid,
   .sources-screen-grid,
+  .sources-screen-grid-rich,
   .compare-screen-grid {
     grid-template-columns: 1fr;
   }
@@ -930,7 +1179,11 @@ button {
   .map-legend-row,
   .console-pane-header,
   .screen-heading,
-  .lower-header {
+  .lower-header,
+  .citation-card,
+  .cartography-head,
+  .cartography-node-row {
+    display: grid;
     grid-template-columns: 1fr;
   }
 }

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
 import { startTransition, useDeferredValue, useEffect, useState } from "react";
 import { ArchiveBackdrop } from "./archive-backdrop";
+import { CartographyPlate } from "./cartography-plate";
 import { RelationOrbit } from "./relation-orbit";
 import {
   archiveSections,
@@ -117,6 +118,11 @@ function buildScanBars(primaryFacts: Array<{ importance: number }>) {
   }));
 }
 
+function truncateText(value: string, maxLength: number) {
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength).trimEnd()}...`;
+}
+
 const shellVariant: Variants = {
   hidden: { opacity: 0 },
   show: {
@@ -183,8 +189,8 @@ export function FieldGuideApp() {
   const topMetrics = [
     { label: "Archive", value: archiveStats.entityCount, detail: "indexed records" },
     { label: "Links", value: archiveStats.relationCount, detail: "cross-references" },
-    { label: "Era trail", value: archiveStats.timelineCount, detail: "timeline beats" },
-    { label: "Sources", value: archiveStats.sourceCount, detail: "canon classes" },
+    { label: "Visuals", value: archiveStats.mediaCount, detail: "cached media assets" },
+    { label: "Sources", value: archiveStats.citationCount, detail: "linked citations" },
   ];
 
   function focusEntity(slug: string, targetScreen: MainScreen = "dossier") {
@@ -424,10 +430,62 @@ export function FieldGuideApp() {
                 <h2>{activeRecord.displayName}</h2>
               </div>
               <div className="screen-meta">
-                <span>{activeRecord.sourceTrail.length} source anchors</span>
+                <span>{activeRecord.citations.length} linked citations</span>
               </div>
             </div>
-            <div className="sources-screen-grid">
+            <div className="sources-screen-grid sources-screen-grid-rich">
+              <article className="source-screen-card media-screen-card">
+                <div className="source-screen-head">
+                  <strong>Visual archive</strong>
+                  <span>{activeRecord.media.length ? `${activeRecord.media.length} cached assets` : "signal plate"}</span>
+                </div>
+                {activeRecord.primaryMedia ? (
+                  <div className="media-stage">
+                    <img alt={activeRecord.primaryMedia.alt} src={activeRecord.primaryMedia.src} />
+                    <div className="media-caption">
+                      <strong>{activeRecord.primaryMedia.title}</strong>
+                      <p>{activeRecord.primaryMedia.caption}</p>
+                    </div>
+                    {activeRecord.galleryMedia.length ? (
+                      <div className="media-thumb-row">
+                        {activeRecord.galleryMedia.map((asset) => (
+                          <figure className="media-thumb" key={asset.id}>
+                            <img alt={asset.alt} src={asset.src} />
+                          </figure>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="media-stage media-stage-empty">
+                    <p className="screen-placeholder">No external image cached for this record. Cartography and citations stay live.</p>
+                  </div>
+                )}
+              </article>
+
+              <CartographyPlate entity={activeRecord} />
+
+              <article className="source-screen-card citation-screen-card">
+                <div className="source-screen-head">
+                  <strong>Citation trail</strong>
+                  <span>Linked references</span>
+                </div>
+                <div className="citation-list">
+                  {activeRecord.citations.map((citation) => (
+                    <article className="citation-card" key={`${activeRecord.slug}-${citation.label}`}>
+                      <div>
+                        <span>{citation.source?.label ?? "Archive source"}</span>
+                        <strong>{citation.label}</strong>
+                        <p>{citation.note}</p>
+                      </div>
+                      <a href={citation.url} rel="noreferrer" target="_blank">
+                        Open source
+                      </a>
+                    </article>
+                  ))}
+                </div>
+              </article>
+
               {activeRecord.sourceTrail.map((source) => (
                 <article className="source-screen-card" key={source.key}>
                   <div className="source-screen-head">
@@ -472,8 +530,10 @@ export function FieldGuideApp() {
               <div className="dossier-line">
                 <span className="lcars-badge">{activeMode.label}</span>
                 <span className="lcars-badge lcars-badge-soft">{activeRecord.canonTier} canon</span>
+                {activeRecord.descriptor ? <span className="lcars-badge lcars-badge-soft">{activeRecord.descriptor}</span> : null}
               </div>
               <p className="dossier-summary">{activeRecord.summary}</p>
+              {activeRecord.bioSections[0] ? <p className="dossier-bio-snippet">{truncateText(activeRecord.bioSections[0].body, 280)}</p> : null}
               <div className="tag-row">
                 {activeRecord.tags.map((tag) => (
                   <span className="tag-pill" key={tag}>
@@ -495,6 +555,29 @@ export function FieldGuideApp() {
             </div>
 
             <div className="dossier-screen-sidecar">
+              <article className="dossier-media-card">
+                {activeRecord.primaryMedia ? (
+                  <>
+                    <div className="dossier-media-frame">
+                      <img alt={activeRecord.primaryMedia.alt} src={activeRecord.primaryMedia.src} />
+                    </div>
+                    <div className="dossier-media-copy">
+                      <span>{activeRecord.primaryMedia.title}</span>
+                      <strong>{activeRecord.displayName}</strong>
+                      <p>{activeRecord.bioSections[1]?.body ?? activeRecord.primaryMedia.caption}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="dossier-media-frame dossier-media-frame-empty" aria-hidden="true" />
+                    <div className="dossier-media-copy">
+                      <span>Archive plate</span>
+                      <strong>{activeRecord.displayName}</strong>
+                      <p>{activeRecord.cartography?.sector ?? "No portrait cached; use the cartography and source screens for deeper context."}</p>
+                    </div>
+                  </>
+                )}
+              </article>
               <div className="console-metric-grid">
                 <article className="console-metric-card">
                   <span>Threat index</span>
@@ -538,12 +621,39 @@ export function FieldGuideApp() {
       return (
         <motion.div className="side-panel-body" key={sidePanel} {...screenTransition}>
           <div className="stack-list">
+            {activeRecord.primaryMedia ? (
+              <article className="side-row-card side-media-card">
+                <div className="side-media-frame">
+                  <img alt={activeRecord.primaryMedia.alt} src={activeRecord.primaryMedia.src} />
+                </div>
+                <div className="side-media-copy">
+                  <span>{activeRecord.primaryMedia.title}</span>
+                  <strong>{activeRecord.displayName}</strong>
+                  <p>{activeRecord.primaryMedia.caption}</p>
+                </div>
+              </article>
+            ) : null}
+            {activeRecord.bioSections.map((section) => (
+              <article className="side-row-card" key={section.heading}>
+                <span>{section.heading}</span>
+                <p>{section.body}</p>
+              </article>
+            ))}
             {Object.entries(activeRecord.profile).map(([label, value]) => (
               <article className="side-row-card" key={label}>
                 <span>{formatLabel(label)}</span>
                 <strong>{value}</strong>
               </article>
             ))}
+            {activeRecord.cartography ? (
+              <article className="side-row-card">
+                <span>Cartography</span>
+                <strong>{activeRecord.cartography.quadrant}</strong>
+                <p>
+                  {activeRecord.cartography.sector} / {activeRecord.cartography.gridLabel}
+                </p>
+              </article>
+            ) : null}
             <article className="side-row-card">
               <span>Diplomatic posture</span>
               <strong>{activeRecord.diplomaticPosture}</strong>
@@ -693,15 +803,24 @@ export function FieldGuideApp() {
       return (
         <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
           <div className="lower-source-grid">
-            {activeRecord.sourceTrail.map((source) => (
-              <article className="lower-card" key={source.key}>
-                <span>{source.label}</span>
-                <strong>{source.sourceType}</strong>
-                <div className="source-bar-track">
-                  <span className="source-bar-fill" style={{ width: `${Math.round(source.canonWeight * 100)}%` }} />
-                </div>
+            {activeRecord.citations.length ? (
+              activeRecord.citations.map((citation) => (
+                <article className="lower-card citation-lower-card" key={`${citation.label}-${citation.url}`}>
+                  <span>{citation.source?.label ?? "Archive source"}</span>
+                  <strong>{citation.label}</strong>
+                  <p>{citation.note}</p>
+                  <a href={citation.url} rel="noreferrer" target="_blank">
+                    Open source
+                  </a>
+                </article>
+              ))
+            ) : (
+              <article className="lower-card">
+                <span>Source trail</span>
+                <strong>No linked citations cached.</strong>
+                <p>Use the main source screen to inspect canon weighting and archive provenance.</p>
               </article>
-            ))}
+            )}
           </div>
         </motion.div>
       );

@@ -12,7 +12,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "source:archive": "node scripts/source-archive.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

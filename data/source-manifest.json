@@ -1,0 +1,184 @@
+[
+  {
+    "slug": "vulcan-species",
+    "wikipediaTitle": "Vulcan_(Star_Trek)",
+    "memoryAlphaPath": "Vulcan",
+    "commonsQuery": "Vulcan Star Trek",
+    "opsNote": "Vulcan dossiers work best as baseline Federation records: long planning horizons, tight protocol, and a homeworld that anchors half the diplomatic map.",
+    "cartography": {
+      "quadrant": "Beta Quadrant",
+      "sector": "40 Eridani / Vulcan system",
+      "gridLabel": "B-7",
+      "rangeLabel": "16 light-years from Sol",
+      "x": 78,
+      "y": 61
+    }
+  },
+  {
+    "slug": "romulan-species",
+    "wikipediaTitle": "Romulan",
+    "memoryAlphaPath": "Romulan",
+    "commonsQuery": "Romulan Star Trek",
+    "opsNote": "Romulan records should always be read as political geography as much as culture: state secrecy, prestige, and border pressure all show up at once.",
+    "cartography": {
+      "quadrant": "Beta Quadrant",
+      "sector": "Romulan Neutral Zone",
+      "gridLabel": "B-5",
+      "rangeLabel": "Border-adjacent strategic space",
+      "x": 84,
+      "y": 38
+    }
+  },
+  {
+    "slug": "klingon-species",
+    "wikipediaTitle": "Klingon",
+    "memoryAlphaPath": "Klingon",
+    "commonsQuery": "Klingon Star Trek",
+    "opsNote": "Klingon archives get more useful when you keep treaty history, house politics, and martial identity on the same screen.",
+    "cartography": {
+      "quadrant": "Beta Quadrant",
+      "sector": "Klingon core worlds",
+      "gridLabel": "B-3",
+      "rangeLabel": "Imperial core corridor",
+      "x": 67,
+      "y": 30
+    }
+  },
+  {
+    "slug": "borg-collective",
+    "wikipediaTitle": "Borg",
+    "memoryAlphaPath": "Borg",
+    "commonsQuery": "Borg Star Trek",
+    "opsNote": "Collective records are threat snapshots, not stable cultural profiles. Treat every Borg dossier as something that can reconfigure itself under pressure.",
+    "cartography": {
+      "quadrant": "Delta Quadrant",
+      "sector": "Unicomplex vector",
+      "gridLabel": "D-4",
+      "rangeLabel": "Deep transwarp territory",
+      "x": 17,
+      "y": 34
+    }
+  },
+  {
+    "slug": "united-federation-of-planets",
+    "wikipediaTitle": "United_Federation_of_Planets",
+    "memoryAlphaPath": "United_Federation_of_Planets",
+    "commonsQuery": "United Federation of Planets Star Trek",
+    "opsNote": "Federation records need ideals and logistics together: charter language means less unless you can also see the worlds, fleets, and treaties holding it up.",
+    "cartography": {
+      "quadrant": "Alpha / Beta Quadrants",
+      "sector": "Federation core",
+      "gridLabel": "A-6",
+      "rangeLabel": "Multi-world interstellar union",
+      "x": 61,
+      "y": 65
+    }
+  },
+  {
+    "slug": "planet-vulcan",
+    "wikipediaTitle": "Vulcan_(Star_Trek)",
+    "memoryAlphaPath": "Vulcan",
+    "commonsQuery": "Vulcan Star Trek",
+    "abstractOverride": "Vulcan is the ancestral homeworld of the Vulcan people and one of the Federation's most important cultural and diplomatic anchor worlds.",
+    "opsNote": "Use Vulcan as the archive's cleanest reference point for first-contact history, Federation founding culture, and Beta Quadrant core geography.",
+    "cartography": {
+      "quadrant": "Beta Quadrant",
+      "sector": "40 Eridani / Vulcan system",
+      "gridLabel": "B-7",
+      "rangeLabel": "Founder-world reference anchor",
+      "x": 78,
+      "y": 61
+    }
+  },
+  {
+    "slug": "planet-romulus",
+    "wikipediaTitle": "Romulus_and_Remus_(Star_Trek)",
+    "memoryAlphaPath": "Romulus",
+    "commonsQuery": "Romulus in local space",
+    "abstractOverride": "Romulus served as the political heart of Romulan power, making it a key reference node for statecraft, secrecy, and diaspora after its loss.",
+    "opsNote": "Romulus belongs on the map even when the dossier is about policy; nearly every Romulan strategic question bends back toward this world.",
+    "cartography": {
+      "quadrant": "Beta Quadrant",
+      "sector": "Romulan core territory",
+      "gridLabel": "B-5",
+      "rangeLabel": "Pre-supernova state center",
+      "x": 86,
+      "y": 40
+    }
+  },
+  {
+    "slug": "planet-qonos",
+    "wikipediaTitle": "Qo'noS",
+    "memoryAlphaPath": "Qo'noS",
+    "commonsQuery": "Klingon Star Trek",
+    "abstractOverride": "Qo'noS is the Klingon homeworld and imperial center, useful as both a cultural anchor and a strategic map node inside the empire's core.",
+    "opsNote": "Qo'noS should read as capital, symbol, and strategic pressure source at the same time; separating those layers makes Klingon records flatter than they are.",
+    "cartography": {
+      "quadrant": "Beta Quadrant",
+      "sector": "Klingon Empire / home system",
+      "gridLabel": "B-2",
+      "rangeLabel": "Imperial capital world",
+      "x": 64,
+      "y": 24
+    }
+  },
+  {
+    "slug": "spock",
+    "wikipediaTitle": "Spock",
+    "memoryAlphaPath": "Spock",
+    "commonsQuery": "Spock Star Trek",
+    "opsNote": "Spock is a bridge record. The interesting part is not the biography alone, but the way Vulcan, Starfleet, and Romulan lines cross through him.",
+    "cartography": {
+      "quadrant": "Alpha / Beta Quadrants",
+      "sector": "Starfleet exploration routes",
+      "gridLabel": "A-7",
+      "rangeLabel": "Mobile command-science vector",
+      "x": 73,
+      "y": 56
+    }
+  },
+  {
+    "slug": "jean-luc-picard",
+    "wikipediaTitle": "Jean-Luc_Picard",
+    "memoryAlphaPath": "Jean-Luc_Picard",
+    "commonsQuery": "Jean-Luc Picard Patrick Stewart",
+    "opsNote": "Picard dossiers come alive when command history, diplomatic posture, and Borg exposure sit in the same visual field instead of separate tabs.",
+    "cartography": {
+      "quadrant": "Alpha Quadrant",
+      "sector": "Sol / Federation command sphere",
+      "gridLabel": "A-8",
+      "rangeLabel": "Starfleet diplomatic command lane",
+      "x": 58,
+      "y": 77
+    }
+  },
+  {
+    "slug": "uss-enterprise-d",
+    "wikipediaTitle": "USS_Enterprise_(NCC-1701-D)",
+    "memoryAlphaPath": "USS_Enterprise_(NCC-1701-D)",
+    "commonsQuery": "USS Enterprise NCC-1701-D",
+    "opsNote": "The Enterprise-D is less a ship card than a moving Federation stage for diplomacy, exploration, and crisis response across multiple sectors.",
+    "cartography": {
+      "quadrant": "Alpha / Beta Quadrants",
+      "sector": "Deep-space exploration lane",
+      "gridLabel": "A-5",
+      "rangeLabel": "Galaxy-class roaming assignment",
+      "x": 57,
+      "y": 63
+    }
+  },
+  {
+    "slug": "khitomer-accords",
+    "memoryAlphaPath": "Khitomer_Accords",
+    "abstractOverride": "The Khitomer Accords mark the diplomatic hinge that stabilized Federation-Klingon relations and reshaped the strategic order of the quadrant.",
+    "opsNote": "This is a treaty record, but it should still feel geographic: Khitomer, Klingon politics, Federation response, and later alliance doctrine all converge here.",
+    "cartography": {
+      "quadrant": "Beta Quadrant",
+      "sector": "Khitomer system",
+      "gridLabel": "B-4",
+      "rangeLabel": "Treaty-world flashpoint",
+      "x": 71,
+      "y": 35
+    }
+  }
+]

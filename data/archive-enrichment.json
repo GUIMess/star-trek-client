@@ -1,0 +1,734 @@
+{
+  "generatedAt": "2026-03-10T03:46:26.658Z",
+  "entities": {
+    "vulcan-species": {
+      "descriptor": "Fictional extraterrestrial species in Star Trek",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "Vulcans, sometimes referred to as Vulcanians, are a fictional extraterrestrial humanoid species in the Star Trek media franchise. They are noted for their strict adherence to logic and reason and suppression of emotion. Known for their pronounced eyebrows and pointed ears, they originate from the fictional planet Vulcan. In the Star Trek universe, they were the first extraterrestrial species to make contact with humans."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Vulcan dossiers work best as baseline Federation records: long planning horizons, tight protocol, and a homeworld that anchors half the diplomatic map."
+        }
+      ],
+      "media": [
+        {
+          "id": "vulcan-species-media-1",
+          "kind": "portrait",
+          "title": "Vulcan (Star Trek)",
+          "src": "/archive/vulcan-species/01.jpg",
+          "alt": "vulcan species archive asset 1",
+          "caption": "Archive reference image",
+          "credit": "Vulcan (Star Trek)",
+          "sourceKey": "wikimedia-commons"
+        },
+        {
+          "id": "vulcan-species-media-2",
+          "kind": "gallery",
+          "title": "Star Trek Federation Officers.jpg",
+          "src": "/archive/vulcan-species/02.jpg",
+          "alt": "vulcan species archive asset 2",
+          "caption": "Commons archival asset",
+          "credit": "Star Trek Federation Officers.jpg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Vulcan_(Star_Trek)",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q6497384",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Vulcan",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Beta Quadrant",
+        "sector": "40 Eridani / Vulcan system",
+        "gridLabel": "B-7",
+        "rangeLabel": "16 light-years from Sol",
+        "x": 78,
+        "y": 61
+      }
+    },
+    "romulan-species": {
+      "descriptor": "Extraterrestrial humanoid species in the Star Trek franchise",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "The Romulans are an extraterrestrial race in the American science fiction franchise Star Trek. Their adopted home world is Romulus, and within the same star system they have settled a sister planet Remus. They first appeared in the series Star Trek (1966–1969). They have appeared in most subsequent Star Trek releases, including The Animated Series, The Next Generation, Deep Space Nine, Voyager, Enterprise, Discovery, Picard, Strange New Worlds, and Lower Decks. They appear in the Star Trek feature films Star Trek V: The Final Frontier (1989), Star Trek VI: The Undiscovered Country (1991), Star Trek: Nemesis (2002) and Star Trek (2009). They also appear in various other spin-off media, including books, comics, toys and games."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Romulan records should always be read as political geography as much as culture: state secrecy, prestige, and border pressure all show up at once."
+        }
+      ],
+      "media": [
+        {
+          "id": "romulan-species-media-1",
+          "kind": "portrait",
+          "title": "Romulan",
+          "src": "/archive/romulan-species/01.jpg",
+          "alt": "romulan species archive asset 1",
+          "caption": "Archive reference image",
+          "credit": "Romulan",
+          "sourceKey": "wikimedia-commons"
+        },
+        {
+          "id": "romulan-species-media-2",
+          "kind": "gallery",
+          "title": "Logo Romulan.svg",
+          "src": "/archive/romulan-species/02.png",
+          "alt": "romulan species archive asset 2",
+          "caption": "Commons archival asset",
+          "credit": "Logo Romulan.svg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Romulan",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q268082",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Romulan",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Beta Quadrant",
+        "sector": "Romulan Neutral Zone",
+        "gridLabel": "B-5",
+        "rangeLabel": "Border-adjacent strategic space",
+        "x": 84,
+        "y": 38
+      }
+    },
+    "klingon-species": {
+      "descriptor": "Fictional species in Star Trek",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "The Klingons are a humanoid species of aliens in the science fiction franchise Star Trek."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Klingon archives get more useful when you keep treaty history, house politics, and martial identity on the same screen."
+        }
+      ],
+      "media": [
+        {
+          "id": "klingon-species-media-1",
+          "kind": "portrait",
+          "title": "Noun Klingon 14248.svg",
+          "src": "/archive/klingon-species/01.png",
+          "alt": "klingon species archive asset 1",
+          "caption": "Commons archival asset",
+          "credit": "Noun Klingon 14248.svg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Klingon",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q54259",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Klingon",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Beta Quadrant",
+        "sector": "Klingon core worlds",
+        "gridLabel": "B-3",
+        "rangeLabel": "Imperial core corridor",
+        "x": 67,
+        "y": 30
+      }
+    },
+    "borg-collective": {
+      "descriptor": "Fictional faction in Star Trek",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "The Borg are an alien group that appear as recurring antagonists in the Star Trek fictional universe. They are cybernetic organisms (cyborgs) linked in a hive mind called \"The Collective\". The Borg co-opted the technology and knowledge of other alien species to the Collective through the process of \"assimilation\": forcibly transforming individual beings into \"drones\" by injecting nanoprobes into their bodies and surgically augmenting them with cybernetic components. The Borg's ultimate goal is \"achieving perfection\"."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Collective records are threat snapshots, not stable cultural profiles. Treat every Borg dossier as something that can reconfigure itself under pressure."
+        }
+      ],
+      "media": [
+        {
+          "id": "borg-collective-media-1",
+          "kind": "portrait",
+          "title": "Borg",
+          "src": "/archive/borg-collective/01.png",
+          "alt": "borg collective archive asset 1",
+          "caption": "Archive reference image",
+          "credit": "Borg",
+          "sourceKey": "wikimedia-commons"
+        },
+        {
+          "id": "borg-collective-media-2",
+          "kind": "gallery",
+          "title": "Borg dockingstation.jpg",
+          "src": "/archive/borg-collective/02.jpg",
+          "alt": "borg collective archive asset 2",
+          "caption": "Commons archival asset",
+          "credit": "Borg dockingstation.jpg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Borg",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q220652",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Borg",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Delta Quadrant",
+        "sector": "Unicomplex vector",
+        "gridLabel": "D-4",
+        "rangeLabel": "Deep transwarp territory",
+        "x": 17,
+        "y": 34
+      }
+    },
+    "united-federation-of-planets": {
+      "descriptor": "Star Trek interplanetary government",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "In the fictional universe of Star Trek, the United Federation of Planets (UFP) is the interstellar government with which, as part of its space force Starfleet, most of the characters and starships of the franchise are affiliated. Commonly called \"the Federation\", it was introduced in the original Star Trek television series. The survival, success, and growth of the Federation and its principles of freedom have become some of the Star Trek franchise's central themes."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Federation records need ideals and logistics together: charter language means less unless you can also see the worlds, fleets, and treaties holding it up."
+        }
+      ],
+      "media": [
+        {
+          "id": "united-federation-of-planets-media-1",
+          "kind": "portrait",
+          "title": "United Federation of Planets",
+          "src": "/archive/united-federation-of-planets/01.png",
+          "alt": "united federation of planets archive asset 1",
+          "caption": "Archive reference image",
+          "credit": "United Federation of Planets",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/United_Federation_of_Planets",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q1110",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/United_Federation_of_Planets",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Alpha / Beta Quadrants",
+        "sector": "Federation core",
+        "gridLabel": "A-6",
+        "rangeLabel": "Multi-world interstellar union",
+        "x": 61,
+        "y": 65
+      }
+    },
+    "planet-vulcan": {
+      "descriptor": "Fictional extraterrestrial species in Star Trek",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "Vulcan is the ancestral homeworld of the Vulcan people and one of the Federation's most important cultural and diplomatic anchor worlds."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Use Vulcan as the archive's cleanest reference point for first-contact history, Federation founding culture, and Beta Quadrant core geography."
+        }
+      ],
+      "media": [
+        {
+          "id": "planet-vulcan-media-1",
+          "kind": "portrait",
+          "title": "Vulcan (Star Trek)",
+          "src": "/archive/planet-vulcan/01.jpg",
+          "alt": "planet vulcan archive asset 1",
+          "caption": "Archive reference image",
+          "credit": "Vulcan (Star Trek)",
+          "sourceKey": "wikimedia-commons"
+        },
+        {
+          "id": "planet-vulcan-media-2",
+          "kind": "gallery",
+          "title": "Star Trek Federation Officers.jpg",
+          "src": "/archive/planet-vulcan/02.jpg",
+          "alt": "planet vulcan archive asset 2",
+          "caption": "Commons archival asset",
+          "credit": "Star Trek Federation Officers.jpg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Vulcan_(Star_Trek)",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q6497384",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Vulcan",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Beta Quadrant",
+        "sector": "40 Eridani / Vulcan system",
+        "gridLabel": "B-7",
+        "rangeLabel": "Founder-world reference anchor",
+        "x": 78,
+        "y": 61
+      }
+    },
+    "planet-romulus": {
+      "descriptor": "Extraterrestrial humanoid species in the Star Trek franchise",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "Romulus served as the political heart of Romulan power, making it a key reference node for statecraft, secrecy, and diaspora after its loss."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Romulus belongs on the map even when the dossier is about policy; nearly every Romulan strategic question bends back toward this world."
+        }
+      ],
+      "media": [
+        {
+          "id": "planet-romulus-media-1",
+          "kind": "portrait",
+          "title": "Romulan",
+          "src": "/archive/planet-romulus/01.jpg",
+          "alt": "planet romulus archive asset 1",
+          "caption": "Archive reference image",
+          "credit": "Romulan",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Romulan",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q268082",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Romulus",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Beta Quadrant",
+        "sector": "Romulan core territory",
+        "gridLabel": "B-5",
+        "rangeLabel": "Pre-supernova state center",
+        "x": 86,
+        "y": 40
+      }
+    },
+    "planet-qonos": {
+      "descriptor": "Fictional species in Star Trek",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "Qo'noS is the Klingon homeworld and imperial center, useful as both a cultural anchor and a strategic map node inside the empire's core."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Qo'noS should read as capital, symbol, and strategic pressure source at the same time; separating those layers makes Klingon records flatter than they are."
+        }
+      ],
+      "media": [
+        {
+          "id": "planet-qonos-media-1",
+          "kind": "portrait",
+          "title": "Noun Klingon 14248.svg",
+          "src": "/archive/planet-qonos/01.png",
+          "alt": "planet qonos archive asset 1",
+          "caption": "Commons archival asset",
+          "credit": "Noun Klingon 14248.svg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Klingon",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q54259",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Qo'noS",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Beta Quadrant",
+        "sector": "Klingon Empire / home system",
+        "gridLabel": "B-2",
+        "rangeLabel": "Imperial capital world",
+        "x": 64,
+        "y": 24
+      }
+    },
+    "spock": {
+      "descriptor": "Fictional character in the Star Trek media franchise",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "Spock is a fictional character in the Star Trek media franchise. Portrayed by Leonard Nimoy, he is one of the three central characters in the original Star Trek series (1966–69), alongside Captain James T. Kirk and Dr. Leonard \"Bones\" McCoy. On that series, Spock served as first officer and science officer of the starship Enterprise. Spock's mixed human–Vulcan heritage serves as an important plot element in many of the character's appearances. As one of the most popular Star Trek characters, Spock has made return appearances in many later installments of the franchise."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Spock is a bridge record. The interesting part is not the biography alone, but the way Vulcan, Starfleet, and Romulan lines cross through him."
+        }
+      ],
+      "media": [
+        {
+          "id": "spock-media-1",
+          "kind": "portrait",
+          "title": "Spock",
+          "src": "/archive/spock/01.jpg",
+          "alt": "spock archive asset 1",
+          "caption": "Archive reference image",
+          "credit": "Spock",
+          "sourceKey": "wikimedia-commons"
+        },
+        {
+          "id": "spock-media-2",
+          "kind": "gallery",
+          "title": "The Shuttle Enterprise - GPN-2000-001363.jpg",
+          "src": "/archive/spock/02.jpg",
+          "alt": "spock archive asset 2",
+          "caption": "Commons archival asset",
+          "credit": "The Shuttle Enterprise - GPN-2000-001363.jpg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Spock",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q16341",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Spock",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Alpha / Beta Quadrants",
+        "sector": "Starfleet exploration routes",
+        "gridLabel": "A-7",
+        "rangeLabel": "Mobile command-science vector",
+        "x": 73,
+        "y": 56
+      }
+    },
+    "jean-luc-picard": {
+      "descriptor": "Character from the Star Trek franchise",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "Jean-Luc Picard is a fictional character in the Star Trek franchise, most often seen as the commanding officer of the Federation starship USS Enterprise (NCC-1701-D). Played by Patrick Stewart, Picard has appeared in the television series Star Trek: The Next Generation (TNG) and the premiere episode of Star Trek: Deep Space Nine, as well as the feature films Star Trek Generations (1994), Star Trek: First Contact (1996), Star Trek: Insurrection (1998), and Star Trek: Nemesis (2002). He is also featured as the central character in the show Star Trek: Picard (2020–2023)."
+        },
+        {
+          "heading": "Operational read",
+          "body": "Picard dossiers come alive when command history, diplomatic posture, and Borg exposure sit in the same visual field instead of separate tabs."
+        }
+      ],
+      "media": [
+        {
+          "id": "jean-luc-picard-media-1",
+          "kind": "portrait",
+          "title": "Enterprise-D crew quarters with captain Jean-Luc Picard.jpg",
+          "src": "/archive/jean-luc-picard/01.jpg",
+          "alt": "jean luc picard archive asset 1",
+          "caption": "Commons archival asset",
+          "credit": "Enterprise-D crew quarters with captain Jean-Luc Picard.jpg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/Jean-Luc_Picard",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q16276",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Jean-Luc_Picard",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Alpha Quadrant",
+        "sector": "Sol / Federation command sphere",
+        "gridLabel": "A-8",
+        "rangeLabel": "Starfleet diplomatic command lane",
+        "x": 58,
+        "y": 77
+      }
+    },
+    "uss-enterprise-d": {
+      "descriptor": "Fictional starship from Star Trek",
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "USS Enterprise (NCC-1701-D), or Enterprise-D, to distinguish it as the fifth Federation vessel with the same name, is a fictional starship in the Star Trek media franchise. Under the command of Captain Jean-Luc Picard, it is the main setting of Star Trek: The Next Generation (1987–1994) and the film Star Trek Generations (1994). It has also been depicted in various spinoffs, films, books, and licensed products."
+        },
+        {
+          "heading": "Operational read",
+          "body": "The Enterprise-D is less a ship card than a moving Federation stage for diplomacy, exploration, and crisis response across multiple sectors."
+        }
+      ],
+      "media": [
+        {
+          "id": "uss-enterprise-d-media-1",
+          "kind": "portrait",
+          "title": "Enterprise-D bridge stations.jpg",
+          "src": "/archive/uss-enterprise-d/01.jpg",
+          "alt": "uss enterprise d archive asset 1",
+          "caption": "Commons archival asset",
+          "credit": "Enterprise-D bridge stations.jpg",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "citations": [
+        {
+          "label": "Wikipedia overview",
+          "url": "https://en.wikipedia.org/wiki/USS_Enterprise_(NCC-1701-D)",
+          "note": "Public encyclopedia summary used for archive abstract and page linkage.",
+          "sourceKey": "wikipedia"
+        },
+        {
+          "label": "Wikidata record",
+          "url": "https://www.wikidata.org/wiki/Q845684",
+          "note": "Structured cross-wiki identifier and metadata anchor.",
+          "sourceKey": "wikidata"
+        },
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/USS_Enterprise_(NCC-1701-D)",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        },
+        {
+          "label": "Wikimedia Commons asset trail",
+          "url": "https://commons.wikimedia.org/",
+          "note": "Local archive visuals are sourced from Wikimedia-hosted assets where possible.",
+          "sourceKey": "wikimedia-commons"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Alpha / Beta Quadrants",
+        "sector": "Deep-space exploration lane",
+        "gridLabel": "A-5",
+        "rangeLabel": "Galaxy-class roaming assignment",
+        "x": 57,
+        "y": 63
+      }
+    },
+    "khitomer-accords": {
+      "descriptor": null,
+      "bioSections": [
+        {
+          "heading": "Archive abstract",
+          "body": "The Khitomer Accords mark the diplomatic hinge that stabilized Federation-Klingon relations and reshaped the strategic order of the quadrant."
+        },
+        {
+          "heading": "Operational read",
+          "body": "This is a treaty record, but it should still feel geographic: Khitomer, Klingon politics, Federation response, and later alliance doctrine all converge here."
+        }
+      ],
+      "media": [],
+      "citations": [
+        {
+          "label": "Memory Alpha entry",
+          "url": "https://memory-alpha.fandom.com/wiki/Khitomer_Accords",
+          "note": "Reference trail for canon-adjacent browsing and terminology.",
+          "sourceKey": "memory-alpha"
+        }
+      ],
+      "cartography": {
+        "quadrant": "Beta Quadrant",
+        "sector": "Khitomer system",
+        "gridLabel": "B-4",
+        "rangeLabel": "Treaty-world flashpoint",
+        "x": 71,
+        "y": 35
+      }
+    }
+  }
+}
