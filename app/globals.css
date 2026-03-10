@@ -2926,6 +2926,8 @@ body {
 .field-guide-shell .screen-panel,
 .field-guide-shell .console-metric-card,
 .field-guide-shell .fact-ribbon-card,
+.field-guide-shell .atlas-preview-card,
+.field-guide-shell .atlas-card,
 .field-guide-shell .dossier-media-card,
 .field-guide-shell .side-media-card,
 .field-guide-shell .side-readout-card,
@@ -2969,6 +2971,8 @@ body {
 }
 
 .field-guide-shell .dossier-screen-layout,
+.field-guide-shell .atlas-screen-layout,
+.field-guide-shell .atlas-card-grid,
 .field-guide-shell .compare-screen-grid,
 .field-guide-shell .timeline-screen-grid,
 .field-guide-shell .sources-screen-grid-rich,
@@ -2980,6 +2984,99 @@ body {
 .field-guide-shell .lower-launch-grid,
 .field-guide-shell .map-screen-layout {
   gap: 0.45rem;
+}
+
+.field-guide-shell .atlas-screen-layout {
+  display: grid;
+  grid-template-columns: minmax(15rem, 18rem) minmax(0, 1fr);
+}
+
+.field-guide-shell .atlas-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-guide-shell .atlas-preview-card,
+.field-guide-shell .atlas-card {
+  position: relative;
+  display: grid;
+  gap: 0.42rem;
+  padding: 0.82rem 0.9rem 0.8rem 1rem;
+  overflow: hidden;
+}
+
+.field-guide-shell .atlas-preview-card::before,
+.field-guide-shell .atlas-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.72rem;
+  background: rgba(255, 204, 102, 0.78);
+}
+
+.field-guide-shell .atlas-preview-card::after,
+.field-guide-shell .atlas-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto auto;
+  width: 4.8rem;
+  height: 0.52rem;
+  background: rgba(255, 204, 102, 0.78);
+}
+
+.field-guide-shell .atlas-card.is-active {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.field-guide-shell .atlas-preview-card span,
+.field-guide-shell .atlas-card span {
+  color: rgba(255, 255, 255, 0.62);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.field-guide-shell .atlas-preview-card strong,
+.field-guide-shell .atlas-card strong {
+  color: var(--text);
+  font-family: var(--font-display), sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
+.field-guide-shell .atlas-card > button {
+  display: grid;
+  gap: 0.24rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.field-guide-shell .atlas-card > button p,
+.field-guide-shell .atlas-preview-card > p {
+  margin: 0;
+}
+
+.field-guide-shell .atlas-preview-actions,
+.field-guide-shell .atlas-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.field-guide-shell .atlas-preview-actions button,
+.field-guide-shell .atlas-card-actions button {
+  min-height: 1.8rem;
+  padding: 0.18rem 0.72rem 0.18rem 0.88rem;
+  border: 0;
+  border-radius: 999px 0.85rem 0.85rem 999px;
+  background: #fc6;
+  color: #000;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.76rem;
 }
 
 .field-guide-shell .console-subline,
@@ -3069,6 +3166,11 @@ body {
   .field-guide-lower-body,
   .field-guide-aux-body {
     min-height: 0;
+  }
+
+  .field-guide-shell .atlas-screen-layout,
+  .field-guide-shell .atlas-card-grid {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -20,7 +20,7 @@ import {
   type ArchiveMode,
 } from "../lib/field-guide";
 
-type MainScreen = "dossier" | "relations" | "timeline" | "compare" | "sources";
+type MainScreen = "catalog" | "dossier" | "relations" | "timeline" | "compare" | "sources";
 type SidePanel = "readout" | "profile" | "search" | "launch";
 type LowerPanel = "timeline" | "compare" | "sources" | "launch";
 
@@ -62,6 +62,7 @@ const modeDeck: Array<{
 ];
 
 const screenDeck: Array<{ id: MainScreen; label: string; code: string; tone: string }> = [
+  { id: "catalog", label: "Atlas", code: "A-00", tone: "lcars-orange-peel-bg" },
   { id: "dossier", label: "Dossier", code: "D-01", tone: "lcars-golden-tanoi-bg" },
   { id: "relations", label: "Relations", code: "R-02", tone: "lcars-pale-canary-bg" },
   { id: "timeline", label: "Timeline", code: "T-03", tone: "lcars-lilac-bg" },
@@ -72,7 +73,7 @@ const screenDeck: Array<{ id: MainScreen; label: string; code: string; tone: str
 const sideDeck: Array<{ id: SidePanel; label: string; tone: string }> = [
   { id: "readout", label: "Readout", tone: "lcars-golden-tanoi-bg" },
   { id: "profile", label: "Profile", tone: "lcars-pale-canary-bg" },
-  { id: "search", label: "Jump", tone: "lcars-lilac-bg" },
+  { id: "search", label: "Search", tone: "lcars-lilac-bg" },
   { id: "launch", label: "Launch", tone: "lcars-periwinkle-bg" },
 ];
 
@@ -169,7 +170,7 @@ const screenTransition = {
 export function FieldGuideApp() {
   const reducedMotion = useReducedMotion();
   const [mode, setMode] = useState<ArchiveMode>("field-guide");
-  const [mainScreen, setMainScreen] = useState<MainScreen>("dossier");
+  const [mainScreen, setMainScreen] = useState<MainScreen>("catalog");
   const [sidePanel, setSidePanel] = useState<SidePanel>("readout");
   const [lowerPanel, setLowerPanel] = useState<LowerPanel>("timeline");
   const [activeSection, setActiveSection] = useState<string | "all">("all");
@@ -190,13 +191,16 @@ export function FieldGuideApp() {
   const compareRecord = compareSlug ? getHydratedEntity(compareSlug, mode) : null;
   const comparison = compareSlug ? buildComparison(activeSlug, compareSlug) : null;
   const searchResults = deferredQuery.trim() ? searchArchive(deferredQuery) : [];
-  const launchRecords = (
+  const sectionRecords = (
     activeSection === "all"
       ? featuredRecords
       : listEntitiesByType(activeSection)
           .map((entity) => getHydratedEntity(entity.slug))
           .filter((entity): entity is NonNullable<typeof entity> => entity !== null)
   ).slice(0, 6);
+  const launchRecords = sectionRecords;
+  const activeSectionMeta = activeSection === "all" ? null : archiveSections.find((section) => section.type === activeSection) ?? null;
+  const viewportLead = sectionRecords[0] ?? activeRecord;
   const relatedTargets = activeRecord.relationTargets
     .map((relationship) => relationship.target)
     .filter((entity): entity is NonNullable<typeof entity> => entity !== null)
@@ -206,6 +210,15 @@ export function FieldGuideApp() {
   const activeMainScreen = screenDeck.find((entry) => entry.id === mainScreen) ?? screenDeck[0];
   const activeSide = sideDeck.find((entry) => entry.id === sidePanel) ?? sideDeck[0];
   const activeLower = lowerDeck.find((entry) => entry.id === lowerPanel) ?? lowerDeck[0];
+  const viewportTitle = mainScreen === "catalog" ? activeSectionMeta?.label ?? "Featured dossiers" : activeRecord.displayName;
+  const viewportEyebrow =
+    mainScreen === "catalog"
+      ? `${activeSection === "all" ? "Archive" : formatType(activeSection)} / browse`
+      : `${formatType(activeRecord.entityType)} / ${activeRecord.era}`;
+  const viewportSubline =
+    mainScreen === "catalog"
+      ? `${sectionRecords.length} records ready in the viewport`
+      : `${activeMode.label} lens active`;
 
   const topMetrics = [
     { label: "Archive", value: archiveStats.entityCount, detail: "indexed records", tone: "lcars-golden-tanoi-bg" },
@@ -218,6 +231,10 @@ export function FieldGuideApp() {
     startTransition(() => {
       setActiveSlug(slug);
       setMainScreen(targetScreen);
+      const entity = getHydratedEntity(slug, mode);
+      if (entity) {
+        setActiveSection(entity.entityType);
+      }
       setSidePanel("readout");
       if (targetScreen === "timeline") {
         setLowerPanel("timeline");
@@ -246,11 +263,11 @@ export function FieldGuideApp() {
   function retuneSection(section: string | "all", leadSlug?: string) {
     startTransition(() => {
       setActiveSection(section);
+      setMainScreen("catalog");
       setLowerPanel("launch");
       setSidePanel("launch");
       if (leadSlug) {
         setActiveSlug(leadSlug);
-        setMainScreen("dossier");
       }
     });
   }
@@ -269,6 +286,74 @@ export function FieldGuideApp() {
   }
 
   function renderMainScreen() {
+    if (mainScreen === "catalog") {
+      return (
+        <motion.section className="console-screen atlas-screen" key={`${mainScreen}-${activeSection}-${mode}`} {...screenTransition}>
+          <div className="screen-panel screen-panel-atlas">
+            <div className="screen-heading">
+              <div>
+                <p className="eyebrow">Archive atlas</p>
+                <h2>{activeSectionMeta?.label ?? "Featured dossiers"}</h2>
+              </div>
+              <div className="screen-actions">
+                <button type="button" onClick={() => focusEntity(viewportLead.slug, "dossier")}>
+                  Open dossier
+                </button>
+                <button type="button" onClick={() => focusEntity(viewportLead.slug, "relations")}>
+                  Open map
+                </button>
+              </div>
+            </div>
+            <div className="atlas-screen-layout">
+              <article className="atlas-preview-card">
+                <span>{activeSectionMeta ? `${activeSectionMeta.count} indexed records` : "Featured launch deck"}</span>
+                <strong>{viewportLead.displayName}</strong>
+                <p>{viewportLead.summary}</p>
+                <div className="tag-row">
+                  {viewportLead.tags.slice(0, 4).map((tag) => (
+                    <span className="tag-pill" key={tag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="atlas-preview-actions">
+                  <button type="button" onClick={() => focusEntity(viewportLead.slug, "dossier")}>
+                    Dossier
+                  </button>
+                  <button type="button" onClick={() => focusEntity(viewportLead.slug, "relations")}>
+                    Map
+                  </button>
+                  <button type="button" onClick={() => focusEntity(viewportLead.slug, "timeline")}>
+                    Timeline
+                  </button>
+                </div>
+              </article>
+
+              <div className="atlas-card-grid">
+                {sectionRecords.map((record) => (
+                  <article className={clsx("atlas-card", record.slug === activeSlug && "is-active")} key={`${activeSection}-${record.slug}`}>
+                    <button type="button" onClick={() => focusEntity(record.slug, "dossier")}>
+                      <span>{formatType(record.entityType)}</span>
+                      <strong>{record.displayName}</strong>
+                      <p>{truncateText(record.summary, 140)}</p>
+                    </button>
+                    <div className="atlas-card-actions">
+                      <button type="button" onClick={() => focusEntity(record.slug, "relations")}>
+                        Map
+                      </button>
+                      <button type="button" onClick={() => dockCompare(record.slug)}>
+                        Dock
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.section>
+      );
+    }
+
     if (mainScreen === "relations") {
       return (
         <motion.section className="console-screen map-screen" key={`${mainScreen}-${activeRecord.slug}`} {...screenTransition}>
@@ -782,6 +867,9 @@ export function FieldGuideApp() {
         <article className="side-readout-card">
           <p className="eyebrow">Quick actions</p>
           <div className="stack-buttons">
+            <button type="button" onClick={() => openMainScreen("catalog")}>
+              Archive atlas
+            </button>
             <button type="button" onClick={() => openMainScreen("relations")}>
               Relation map
             </button>
@@ -791,6 +879,16 @@ export function FieldGuideApp() {
             <button type="button" onClick={() => setSidePanel("search")}>
               Archive jump
             </button>
+          </div>
+        </article>
+        <article className="side-readout-card">
+          <p className="eyebrow">Lens controls</p>
+          <div className="stack-buttons">
+            {modeDeck.map((entry) => (
+              <button key={entry.id} type="button" onClick={() => changeMode(entry.id)}>
+                {entry.label}
+              </button>
+            ))}
           </div>
         </article>
       </motion.div>
@@ -935,8 +1033,8 @@ export function FieldGuideApp() {
               </div>
               <div className={`lcars-element right-rounded ${activeMainScreen.tone} field-guide-status-pill`}>
                 <div className="field-guide-status-copy">
-                  <span>Screen</span>
-                  <strong>{activeRecord.displayName}</strong>
+                  <span>Viewport</span>
+                  <strong>{viewportTitle}</strong>
                 </div>
               </div>
               {topMetrics.map((metric) => (
@@ -957,47 +1055,22 @@ export function FieldGuideApp() {
             <section className="field-guide-block">
               <div className="lcars-row field-guide-section-head">
                 <div className="lcars-bar horizontal lcars-golden-tanoi-bg">
-                  <div className="lcars-title">Modes</div>
+                  <div className="lcars-title">Archive index</div>
                 </div>
-                <div className={clsx("lcars-element right-rounded field-guide-head-chip", activeMode.tone)}>
-                  <span>{activeMode.code}</span>
-                </div>
-              </div>
-              <div className="field-guide-block-body">
-                {modeDeck.map((entry) => (
-                  <button
-                    className={clsx(
-                      "lcars-element button left-rounded field-guide-shell-button",
-                      entry.tone,
-                      mode === entry.id && "is-active"
-                    )}
-                    key={entry.id}
-                    type="button"
-                    onClick={() => changeMode(entry.id)}
-                  >
-                    <div className="field-guide-shell-button-code">{entry.code}</div>
-                    <div className="field-guide-shell-button-copy">
-                      <strong>{entry.label}</strong>
-                      <span>{entry.summary}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="field-guide-block">
-              <div className="lcars-row field-guide-section-head">
-                <div className="lcars-bar horizontal lcars-blue-bell-bg">
-                  <div className="lcars-title">Archive strata</div>
-                </div>
-                <div className="lcars-element right-rounded lcars-blue-bell-bg field-guide-head-chip">
-                  <span>{activeSection === "all" ? "featured" : activeSection}</span>
+                <div
+                  className={clsx(
+                    "lcars-element right-rounded field-guide-head-chip",
+                    activeSection === "all" ? "lcars-husk-bg" : getSectionTone(activeSection)
+                  )}
+                >
+                  <span>{activeSection === "all" ? "all" : activeSection}</span>
                 </div>
               </div>
               <div className="field-guide-block-body">
                 <button
                   className={clsx(
-                    "lcars-element button left-rounded field-guide-shell-button lcars-husk-bg",
+                    "lcars-element button left-rounded field-guide-shell-button",
+                    "lcars-husk-bg",
                     activeSection === "all" && "is-active"
                   )}
                   type="button"
@@ -1009,21 +1082,52 @@ export function FieldGuideApp() {
                     <span>Launch records</span>
                   </div>
                 </button>
-                {archiveSections.map((section) => (
+                {archiveSections.map((entry) => (
                   <button
                     className={clsx(
                       "lcars-element button left-rounded field-guide-shell-button",
-                      getSectionTone(section.type),
-                      activeSection === section.type && "is-active"
+                      getSectionTone(entry.type),
+                      activeSection === entry.type && "is-active"
                     )}
-                    key={section.type}
+                    key={entry.type}
                     type="button"
-                    onClick={() => retuneSection(section.type, section.leadSlug)}
+                    onClick={() => retuneSection(entry.type, entry.leadSlug)}
                   >
-                    <div className="field-guide-shell-button-code">{section.type.slice(0, 3).toUpperCase()}</div>
+                    <div className="field-guide-shell-button-code">{entry.type.slice(0, 3).toUpperCase()}</div>
                     <div className="field-guide-shell-button-copy">
-                      <strong>{section.label}</strong>
-                      <span>{section.count} records</span>
+                      <strong>{entry.label}</strong>
+                      <span>{entry.count} records</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="field-guide-block">
+              <div className="lcars-row field-guide-section-head">
+                <div className="lcars-bar horizontal lcars-blue-bell-bg">
+                  <div className="lcars-title">Viewport deck</div>
+                </div>
+                <div className="lcars-element right-rounded lcars-blue-bell-bg field-guide-head-chip">
+                  <span>{sectionRecords.length} records</span>
+                </div>
+              </div>
+              <div className="field-guide-block-body">
+                {sectionRecords.map((section) => (
+                  <button
+                    className={clsx(
+                      "lcars-element button left-rounded field-guide-shell-button",
+                      getSectionTone(section.entityType),
+                      activeSlug === section.slug && "is-active"
+                    )}
+                    key={section.slug}
+                    type="button"
+                    onClick={() => focusEntity(section.slug, "dossier")}
+                  >
+                    <div className="field-guide-shell-button-code">{section.entityType.slice(0, 3).toUpperCase()}</div>
+                    <div className="field-guide-shell-button-copy">
+                      <strong>{section.displayName}</strong>
+                      <span>{truncateText(section.summary, 72)}</span>
                     </div>
                   </button>
                 ))}
@@ -1044,11 +1148,9 @@ export function FieldGuideApp() {
 
               <div className="field-guide-screen-head">
                 <div className="field-guide-active-box">
-                  <p className="eyebrow">
-                    {formatType(activeRecord.entityType)} / {activeRecord.era}
-                  </p>
-                  <h2>{activeRecord.displayName}</h2>
-                  <p>{activeMode.label} lens active</p>
+                  <p className="eyebrow">{viewportEyebrow}</p>
+                  <h2>{viewportTitle}</h2>
+                  <p>{viewportSubline}</p>
                 </div>
 
                 <div className="field-guide-tab-strip">
