@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
-import { startTransition, useDeferredValue, useEffect, useState } from "react";
+import { startTransition, useDeferredValue, useEffect, useState, type CSSProperties } from "react";
 import { ArchiveBackdrop } from "./archive-backdrop";
 import { CartographyPlate } from "./cartography-plate";
 import { RelationOrbit } from "./relation-orbit";
@@ -77,6 +77,10 @@ const lowerDeck: Array<{ id: LowerPanel; label: string }> = [
   { id: "sources", label: "Sources" },
   { id: "launch", label: "Launch" },
 ];
+
+const DESKTOP_STAGE_WIDTH = 1480;
+const DESKTOP_STAGE_HEIGHT = 900;
+const DESKTOP_STAGE_BREAKPOINT = 1360;
 
 function formatThreat(value: string) {
   if (!value || value === "n/a") return "Context specific";
@@ -158,6 +162,12 @@ export function FieldGuideApp() {
   const [compareSlug, setCompareSlug] = useState<string | null>(defaultCompareSlug);
   const [query, setQuery] = useState("");
   const [stardate, setStardate] = useState(buildStardate());
+  const [desktopStage, setDesktopStage] = useState({
+    enabled: false,
+    scale: 1,
+    width: 0,
+    height: 0,
+  });
   const deferredQuery = useDeferredValue(query);
 
   useEffect(() => {
@@ -165,6 +175,52 @@ export function FieldGuideApp() {
     update();
     const interval = window.setInterval(update, 60_000);
     return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const updateDesktopStage = () => {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const enableFit = viewportWidth > DESKTOP_STAGE_BREAKPOINT;
+
+      if (!enableFit) {
+        setDesktopStage((current) => (
+          current.enabled
+            ? { enabled: false, scale: 1, width: 0, height: 0 }
+            : current
+        ));
+        return;
+      }
+
+      const gutterX = Math.max(10, Math.round(viewportWidth * 0.012));
+      const gutterY = Math.max(10, Math.round(viewportHeight * 0.012));
+      const availableWidth = Math.max(viewportWidth - gutterX * 2, 320);
+      const availableHeight = Math.max(viewportHeight - gutterY * 2, 320);
+      const scale = Math.min(
+        availableWidth / DESKTOP_STAGE_WIDTH,
+        availableHeight / DESKTOP_STAGE_HEIGHT,
+        1
+      );
+      const next = {
+        enabled: true,
+        scale: Number(scale.toFixed(4)),
+        width: Math.round(DESKTOP_STAGE_WIDTH * scale),
+        height: Math.round(DESKTOP_STAGE_HEIGHT * scale),
+      };
+
+      setDesktopStage((current) => (
+        current.enabled === next.enabled &&
+        current.scale === next.scale &&
+        current.width === next.width &&
+        current.height === next.height
+          ? current
+          : next
+      ));
+    };
+
+    updateDesktopStage();
+    window.addEventListener("resize", updateDesktopStage);
+    return () => window.removeEventListener("resize", updateDesktopStage);
   }, []);
 
   const activeRecord = getHydratedEntity(activeSlug, mode) ?? featuredRecords[0];
@@ -185,6 +241,11 @@ export function FieldGuideApp() {
   const scanBars = buildScanBars(activeRecord.primaryFacts);
   const activeMode = modeDeck.find((entry) => entry.id === mode) ?? modeDeck[0];
   const activeMainScreen = screenDeck.find((entry) => entry.id === mainScreen) ?? screenDeck[0];
+  const desktopStageStyle = desktopStage.enabled ? ({
+    "--archive-fit-scale": String(desktopStage.scale),
+    "--archive-fit-width": `${desktopStage.width}px`,
+    "--archive-fit-height": `${desktopStage.height}px`,
+  } as CSSProperties) : undefined;
 
   const topMetrics = [
     { label: "Archive", value: archiveStats.entityCount, detail: "indexed records" },
@@ -875,172 +936,174 @@ export function FieldGuideApp() {
   }
 
   return (
-    <main className="archive-root">
+    <main className={clsx("archive-root", desktopStage.enabled && "is-fitted")} style={desktopStageStyle}>
       <ArchiveBackdrop />
-      <motion.div className="archive-shell" initial="hidden" animate="show" variants={shellVariant}>
-        <motion.header className="console-header panel-chrome" variants={panelVariant}>
-          <div className="console-id">
-            <div className="console-title-block">
-              <p className="eyebrow">LCARS access node</p>
-              <h1>Trek Field Guide</h1>
-            </div>
-            <p className="console-subline">
-              Species / worlds / ships / factions / treaty records / cartography
-            </p>
-          </div>
-          <div className="console-statusband">
-            <span className="lcars-chip lcars-chip-primary">archive link stable</span>
-            <span className="lcars-chip">stardate {stardate}</span>
-            <span className="lcars-chip">{activeRecord.displayName}</span>
-            <span className="lcars-chip">{activeMainScreen.label}</span>
-          </div>
-          <div className="console-topmetrics">
-            {topMetrics.map((metric) => (
-              <article className="topmetric-card" key={metric.label}>
-                <span>{metric.label}</span>
-                <strong>{metric.value}</strong>
-                <small>{metric.detail}</small>
-              </article>
-            ))}
-          </div>
-        </motion.header>
-
-        <motion.div className="lcars-workstation" variants={panelVariant}>
-          <aside className="lcars-rail panel-chrome">
-            <div className="rail-group">
-              <div className="panel-head">
-                <p className="eyebrow">Modes</p>
-                <span>{activeMode.code}</span>
+      <div className={clsx("archive-stage", desktopStage.enabled && "is-fitted")}>
+        <motion.div className="archive-shell" initial="hidden" animate="show" variants={shellVariant}>
+          <motion.header className="console-header panel-chrome" variants={panelVariant}>
+            <div className="console-id">
+              <div className="console-title-block">
+                <p className="eyebrow">LCARS access node</p>
+                <h1>Trek Field Guide</h1>
               </div>
-              <div className="mode-stack">
-                {modeDeck.map((entry) => (
-                  <button
-                    className={clsx("mode-button", mode === entry.id && "is-active")}
-                    key={entry.id}
-                    type="button"
-                    onClick={() => changeMode(entry.id)}
-                  >
-                    <span>{entry.code}</span>
-                    <strong>{entry.label}</strong>
-                    <small>{entry.summary}</small>
-                  </button>
-                ))}
-              </div>
+              <p className="console-subline">
+                Species / worlds / ships / factions / treaty records / cartography
+              </p>
             </div>
-
-            <div className="rail-group">
-              <div className="panel-head">
-                <p className="eyebrow">Archive strata</p>
-                <span>{activeSection === "all" ? "featured" : activeSection}</span>
-              </div>
-              <div className="section-grid">
-                <button
-                  className={clsx("section-card", activeSection === "all" && "is-active")}
-                  type="button"
-                  onClick={() => retuneSection("all", featuredRecords[0]?.slug)}
-                >
-                  <strong>Featured</strong>
-                  <span>Launch records</span>
-                </button>
-                {archiveSections.map((section) => (
-                  <button
-                    className={clsx("section-card", activeSection === section.type && "is-active")}
-                    key={section.type}
-                    type="button"
-                    onClick={() => retuneSection(section.type, section.leadSlug)}
-                  >
-                    <strong>{section.label}</strong>
-                    <span>{section.count} records</span>
-                  </button>
-                ))}
-              </div>
+            <div className="console-statusband">
+              <span className="lcars-chip lcars-chip-primary">archive link stable</span>
+              <span className="lcars-chip">stardate {stardate}</span>
+              <span className="lcars-chip">{activeRecord.displayName}</span>
+              <span className="lcars-chip">{activeMainScreen.label}</span>
             </div>
-          </aside>
-
-          <section className="lcars-core panel-chrome">
-            <div className="console-pane-header">
-              <div>
-                <p className="eyebrow">Active screen</p>
-                <div className="active-stamp">
-                  <strong>{activeRecord.displayName}</strong>
-                  <span>
-                    {formatType(activeRecord.entityType)} / {activeRecord.era}
-                  </span>
-                </div>
-              </div>
-              <div className="screen-tabbar">
-                {screenDeck.map((entry) => (
-                  <button
-                    className={clsx("tab-button", mainScreen === entry.id && "is-active")}
-                    key={entry.id}
-                    type="button"
-                    onClick={() => openMainScreen(entry.id)}
-                  >
-                    <span>{entry.code}</span>
-                    <strong>{entry.label}</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="console-pane-body">
-              <AnimatePresence mode="wait" initial={false}>
-                {renderMainScreen()}
-              </AnimatePresence>
-            </div>
-          </section>
-
-          <aside className="lcars-aux panel-chrome">
-            <div className="panel-head">
-              <p className="eyebrow">Auxiliary</p>
-              <span>{sidePanel}</span>
-            </div>
-            <div className="aux-tabbar">
-              {sideDeck.map((entry) => (
-                <button
-                  className={clsx("aux-button", sidePanel === entry.id && "is-active")}
-                  key={entry.id}
-                  type="button"
-                  onClick={() => setSidePanel(entry.id)}
-                >
-                  {entry.label}
-                </button>
+            <div className="console-topmetrics">
+              {topMetrics.map((metric) => (
+                <article className="topmetric-card" key={metric.label}>
+                  <span>{metric.label}</span>
+                  <strong>{metric.value}</strong>
+                  <small>{metric.detail}</small>
+                </article>
               ))}
             </div>
-            <div className="aux-panel-scroll">
-              <AnimatePresence mode="wait" initial={false}>
-                {renderSidePanel()}
-              </AnimatePresence>
-            </div>
-          </aside>
+          </motion.header>
 
-          <section className="lcars-lower panel-chrome">
-            <div className="lower-header">
-              <div className="panel-head panel-head-tight">
-                <p className="eyebrow">Lower strip</p>
-                <span>{lowerPanel}</span>
+          <motion.div className="lcars-workstation" variants={panelVariant}>
+            <aside className="lcars-rail panel-chrome">
+              <div className="rail-group">
+                <div className="panel-head">
+                  <p className="eyebrow">Modes</p>
+                  <span>{activeMode.code}</span>
+                </div>
+                <div className="mode-stack">
+                  {modeDeck.map((entry) => (
+                    <button
+                      className={clsx("mode-button", mode === entry.id && "is-active")}
+                      key={entry.id}
+                      type="button"
+                      onClick={() => changeMode(entry.id)}
+                    >
+                      <span>{entry.code}</span>
+                      <strong>{entry.label}</strong>
+                      <small>{entry.summary}</small>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="lower-tabbar">
-                {lowerDeck.map((entry) => (
+
+              <div className="rail-group">
+                <div className="panel-head">
+                  <p className="eyebrow">Archive strata</p>
+                  <span>{activeSection === "all" ? "featured" : activeSection}</span>
+                </div>
+                <div className="section-grid">
                   <button
-                    className={clsx("lower-button", lowerPanel === entry.id && "is-active")}
+                    className={clsx("section-card", activeSection === "all" && "is-active")}
+                    type="button"
+                    onClick={() => retuneSection("all", featuredRecords[0]?.slug)}
+                  >
+                    <strong>Featured</strong>
+                    <span>Launch records</span>
+                  </button>
+                  {archiveSections.map((section) => (
+                    <button
+                      className={clsx("section-card", activeSection === section.type && "is-active")}
+                      key={section.type}
+                      type="button"
+                      onClick={() => retuneSection(section.type, section.leadSlug)}
+                    >
+                      <strong>{section.label}</strong>
+                      <span>{section.count} records</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </aside>
+
+            <section className="lcars-core panel-chrome">
+              <div className="console-pane-header">
+                <div>
+                  <p className="eyebrow">Active screen</p>
+                  <div className="active-stamp">
+                    <strong>{activeRecord.displayName}</strong>
+                    <span>
+                      {formatType(activeRecord.entityType)} / {activeRecord.era}
+                    </span>
+                  </div>
+                </div>
+                <div className="screen-tabbar">
+                  {screenDeck.map((entry) => (
+                    <button
+                      className={clsx("tab-button", mainScreen === entry.id && "is-active")}
+                      key={entry.id}
+                      type="button"
+                      onClick={() => openMainScreen(entry.id)}
+                    >
+                      <span>{entry.code}</span>
+                      <strong>{entry.label}</strong>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="console-pane-body">
+                <AnimatePresence mode="wait" initial={false}>
+                  {renderMainScreen()}
+                </AnimatePresence>
+              </div>
+            </section>
+
+            <aside className="lcars-aux panel-chrome">
+              <div className="panel-head">
+                <p className="eyebrow">Auxiliary</p>
+                <span>{sidePanel}</span>
+              </div>
+              <div className="aux-tabbar">
+                {sideDeck.map((entry) => (
+                  <button
+                    className={clsx("aux-button", sidePanel === entry.id && "is-active")}
                     key={entry.id}
                     type="button"
-                    onClick={() => setLowerPanel(entry.id)}
+                    onClick={() => setSidePanel(entry.id)}
                   >
                     {entry.label}
                   </button>
                 ))}
               </div>
-            </div>
-            <div className="lower-panel-scroll">
-              <AnimatePresence mode="wait" initial={false}>
-                {renderLowerPanel()}
-              </AnimatePresence>
-            </div>
-          </section>
+              <div className="aux-panel-scroll">
+                <AnimatePresence mode="wait" initial={false}>
+                  {renderSidePanel()}
+                </AnimatePresence>
+              </div>
+            </aside>
+
+            <section className="lcars-lower panel-chrome">
+              <div className="lower-header">
+                <div className="panel-head panel-head-tight">
+                  <p className="eyebrow">Lower strip</p>
+                  <span>{lowerPanel}</span>
+                </div>
+                <div className="lower-tabbar">
+                  {lowerDeck.map((entry) => (
+                    <button
+                      className={clsx("lower-button", lowerPanel === entry.id && "is-active")}
+                      key={entry.id}
+                      type="button"
+                      onClick={() => setLowerPanel(entry.id)}
+                    >
+                      {entry.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="lower-panel-scroll">
+                <AnimatePresence mode="wait" initial={false}>
+                  {renderLowerPanel()}
+                </AnimatePresence>
+              </div>
+            </section>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </main>
   );
 }

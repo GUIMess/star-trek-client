@@ -48,6 +48,13 @@ button {
   overflow: hidden;
 }
 
+.archive-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 0;
+}
+
 .archive-shell {
   position: relative;
   z-index: 1;
@@ -2404,6 +2411,15 @@ body {
     --lcars-rail-col: clamp(10.25rem, 16vw, 11.75rem);
     --lcars-aux-col: clamp(11.75rem, 18vw, 13.25rem);
     --lcars-lower-row: clamp(8.75rem, 17vh, 10.25rem);
+    height: auto;
+    min-height: 100dvh;
+    overflow: auto;
+  }
+
+  .archive-shell {
+    height: auto;
+    min-height: calc(100dvh - (var(--lcars-edge) * 2));
+    grid-template-rows: auto auto;
   }
 
   .console-header {
@@ -2417,6 +2433,24 @@ body {
   .console-statusband,
   .console-topmetrics {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lcars-workstation {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr) clamp(13rem, 30vw, 15rem);
+    grid-template-rows: auto minmax(24rem, 48vh) minmax(10rem, auto);
+    grid-template-areas:
+      "rail rail"
+      "core aux"
+      "lower lower";
+  }
+
+  .lcars-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--lcars-gap);
+    overflow: visible;
   }
 }
 
@@ -2527,5 +2561,34 @@ body {
 
   .mode-button small {
     -webkit-line-clamp: 3;
+  }
+}
+
+@media (min-width: 1361px) {
+  .archive-root.is-fitted {
+    display: grid;
+    align-content: start;
+    justify-items: center;
+  }
+
+  .archive-stage.is-fitted {
+    width: var(--archive-fit-width, 100%);
+    height: var(--archive-fit-height, auto);
+    flex: 0 0 auto;
+  }
+
+  .archive-stage.is-fitted .archive-shell {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1480px;
+    height: 900px;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0.28rem 0 0.22rem;
+    transform: scale(var(--archive-fit-scale, 1));
+    transform-origin: top left;
+    will-change: transform;
   }
 }
