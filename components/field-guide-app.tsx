@@ -132,19 +132,19 @@ const shellVariant: Variants = {
 };
 
 const panelVariant: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 10 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const screenTransition = {
-  initial: { opacity: 0, x: 20, scale: 0.985 },
-  animate: { opacity: 1, x: 0, scale: 1 },
-  exit: { opacity: 0, x: -20, scale: 0.985 },
-  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+  initial: { opacity: 0.36, clipPath: "inset(0 100% 0 0 round 24px)", filter: "blur(5px)" },
+  animate: { opacity: 1, clipPath: "inset(0 0% 0 0 round 24px)", filter: "blur(0px)" },
+  exit: { opacity: 0.18, clipPath: "inset(0 0 0 100% round 24px)", filter: "blur(5px)" },
+  transition: { duration: 0.26, ease: [0.32, 0, 0.2, 1] as [number, number, number, number] },
 };
 
 export function FieldGuideApp() {
@@ -604,10 +604,10 @@ export function FieldGuideApp() {
             </div>
           </div>
           <div className="facts-ribbon">
-            {activeRecord.primaryFacts.slice(0, 4).map((fact) => (
+            {activeRecord.primaryFacts.slice(0, 3).map((fact) => (
               <article className="fact-ribbon-card" key={fact.label}>
                 <span>{fact.label}</span>
-                <strong>{fact.value}</strong>
+                <strong>{truncateText(fact.value, 82)}</strong>
               </article>
             ))}
           </div>
@@ -885,7 +885,7 @@ export function FieldGuideApp() {
               <h1>Trek Field Guide</h1>
             </div>
             <p className="console-subline">
-              Federation archive wall for species, worlds, ships, factions, and treaty incidents. Touch any panel to retune the active screen.
+              Species / worlds / ships / factions / treaty records / cartography
             </p>
           </div>
           <div className="console-statusband">
