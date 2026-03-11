@@ -389,23 +389,55 @@ export function FieldGuideApp() {
                 </button>
               </div>
             </div>
-            <div className="map-screen-layout">
-              <div className="map-stage">
-                <RelationOrbit compareSlug={compareSlug} entity={activeRecord} onCompare={dockCompare} onSelect={focusEntity} />
-              </div>
-              <div className="map-legend">
-                {activeRecord.relationTargets.map((relation) => (
-                  <article className="map-legend-row" key={`${activeRecord.slug}-${relation.targetSlug}`}>
-                    <div>
-                      <span>{relation.typeLabel}</span>
+            <div className="relation-command-band">
+              <article className="relation-command-plate">
+                <span className="relation-command-code">Cartography anchor</span>
+                <strong>{activeRecord.cartography?.quadrant ?? "Archive relay"}</strong>
+                <p>{activeRecord.cartography?.sector ?? "Mapped relation traffic routes through the current dossier and its linked records."}</p>
+              </article>
+              <article className="relation-command-plate">
+                <span className="relation-command-code">Indexed links</span>
+                <strong>{activeRecord.relationTargets.length}</strong>
+                <p>{relatedTargets.length} addressable dossiers can be opened or docked directly from this map.</p>
+              </article>
+              <article className="relation-command-plate">
+                <span className="relation-command-code">Context bias</span>
+                <strong>{activeMode.label}</strong>
+                <p>{activeRecord.primaryFacts[0]?.value ?? "Relation weighting will favor the current archive mode and dossier context."}</p>
+              </article>
+            </div>
+            <div className="map-screen-layout relation-screen-layout">
+              <article className="relation-stage-plate">
+                <div className="relation-stage-head">
+                  <div>
+                    <p className="eyebrow">Cartography plate</p>
+                    <strong>{activeRecord.displayName}</strong>
+                  </div>
+                  <div className="relation-stage-meta">
+                    <span>{formatType(activeRecord.entityType)}</span>
+                    <span>{activeRecord.era}</span>
+                  </div>
+                </div>
+                <div className="map-stage relation-stage-viewport">
+                  <RelationOrbit compareSlug={compareSlug} entity={activeRecord} onCompare={dockCompare} onSelect={focusEntity} />
+                </div>
+              </article>
+              <div className="map-legend relation-ledger">
+                {activeRecord.relationTargets.map((relation, index) => (
+                  <article className="relation-ledger-row" key={`${activeRecord.slug}-${relation.targetSlug}`}>
+                    <div className="relation-ledger-rail">
+                      <span>R-{index + 1}</span>
+                      <strong>{relation.typeLabel}</strong>
+                    </div>
+                    <div className="relation-ledger-copy">
                       <strong>{relation.target?.displayName ?? relation.targetSlug}</strong>
                       <p>{relation.description}</p>
                     </div>
-                    <div className="legend-actions">
+                    <div className="legend-actions relation-ledger-actions">
                       {relation.target ? (
                         <>
                           <button type="button" onClick={() => focusEntity(relation.target!.slug, "dossier")}>
-                            Open
+                            Dossier
                           </button>
                           <button type="button" onClick={() => dockCompare(relation.target!.slug)}>
                             Dock
@@ -435,7 +467,7 @@ export function FieldGuideApp() {
                 <span>{activeRecord.timelineTrail.length || 1} indexed events</span>
               </div>
             </div>
-            <div className="timeline-screen-grid">
+            <div className="timeline-screen-grid timeline-era-strip">
               {activeRecord.timelineTrail.length ? (
                 activeRecord.timelineTrail.map((event, index) => (
                   <motion.article
@@ -445,10 +477,14 @@ export function FieldGuideApp() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.28, delay: reducedMotion ? 0 : index * 0.05 }}
                   >
-                    <span>{event.eraLabel}</span>
-                    <strong>{event.headline}</strong>
-                    <p>{event.detail}</p>
-                    <small>{event.source?.label ?? "Archive source"}</small>
+                    <div className="timeline-era-rail">
+                      <span>{event.eraLabel}</span>
+                    </div>
+                    <div className="timeline-card-copy">
+                      <strong>{event.headline}</strong>
+                      <p>{event.detail}</p>
+                      <small>{event.source?.label ?? "Archive source"}</small>
+                    </div>
                   </motion.article>
                 ))
               ) : (
@@ -556,8 +592,25 @@ export function FieldGuideApp() {
                 <span>{activeRecord.citations.length} linked citations</span>
               </div>
             </div>
-            <div className="sources-screen-grid sources-screen-grid-rich">
-              <article className="source-screen-card media-screen-card">
+            <div className="source-manifest-band">
+              <article className="source-manifest-card">
+                <span>Media cache</span>
+                <strong>{activeRecord.media.length || 0}</strong>
+                <p>Recovered visual plates tied to this dossier.</p>
+              </article>
+              <article className="source-manifest-card">
+                <span>Citation trail</span>
+                <strong>{activeRecord.citations.length}</strong>
+                <p>Linked references available for quick audit.</p>
+              </article>
+              <article className="source-manifest-card">
+                <span>Trust stack</span>
+                <strong>{activeRecord.sourceTrail.length}</strong>
+                <p>Weighted archive sources contributing to the record.</p>
+              </article>
+            </div>
+            <div className="sources-screen-grid sources-screen-grid-rich sources-archive-grid">
+              <article className="source-screen-card media-screen-card source-plate">
                 <div className="source-screen-head">
                   <strong>Visual archive</strong>
                   <span>{activeRecord.media.length ? `${activeRecord.media.length} cached assets` : "signal plate"}</span>
@@ -588,45 +641,59 @@ export function FieldGuideApp() {
 
               <CartographyPlate entity={activeRecord} />
 
-              <article className="source-screen-card citation-screen-card">
+              <article className="source-screen-card citation-screen-card source-plate">
                 <div className="source-screen-head">
-                  <strong>Citation trail</strong>
+                  <strong>Archive provenance</strong>
                   <span>Linked references</span>
                 </div>
-                <div className="citation-list">
-                  {activeRecord.citations.map((citation) => (
-                    <article className="citation-card" key={`${activeRecord.slug}-${citation.label}`}>
-                      <div>
+                <div className="citation-ledger">
+                  {activeRecord.citations.map((citation, index) => (
+                    <article className="citation-card citation-ledger-row" key={`${activeRecord.slug}-${citation.label}`}>
+                      <div className="citation-ledger-rail">
+                        <span>C-{index + 1}</span>
+                      </div>
+                      <div className="citation-ledger-copy">
                         <span>{citation.source?.label ?? "Archive source"}</span>
                         <strong>{citation.label}</strong>
                         <p>{citation.note}</p>
                       </div>
                       <a href={citation.url} rel="noreferrer" target="_blank">
-                        Open source
+                        Open
                       </a>
                     </article>
                   ))}
                 </div>
               </article>
 
-              {activeRecord.sourceTrail.map((source) => (
-                <article className="source-screen-card" key={source.key}>
-                  <div className="source-screen-head">
-                    <strong>{source.label}</strong>
-                    <span>{source.sourceType}</span>
-                  </div>
-                  <div className="source-bar-track">
-                    <span className="source-bar-fill" style={{ width: `${Math.round(source.canonWeight * 100)}%` }} />
-                  </div>
-                  <p>{Math.round(source.canonWeight * 100)}% trust weighting</p>
-                </article>
-              ))}
-              <article className="source-screen-card source-index-card">
-                <p className="eyebrow">Archive index</p>
-                <div className="source-legend">
-                  {sourceRecords.map((source) => (
-                    <span key={source.key}>{source.label}</span>
+              <article className="source-screen-card source-register-card source-plate">
+                <div className="source-screen-head">
+                  <strong>Trust register</strong>
+                  <span>Canon weighting</span>
+                </div>
+                <div className="source-register-list">
+                  {activeRecord.sourceTrail.map((source, index) => (
+                    <article className="source-register-row" key={source.key}>
+                      <div className="source-register-rail">
+                        <span>S-{index + 1}</span>
+                        <strong>{source.sourceType}</strong>
+                      </div>
+                      <div className="source-register-copy">
+                        <strong>{source.label}</strong>
+                        <div className="source-bar-track">
+                          <span className="source-bar-fill" style={{ width: `${Math.round(source.canonWeight * 100)}%` }} />
+                        </div>
+                        <p>{Math.round(source.canonWeight * 100)}% trust weighting</p>
+                      </div>
+                    </article>
                   ))}
+                </div>
+                <div className="source-index-card">
+                  <p className="eyebrow">Archive index</p>
+                  <div className="source-legend">
+                    {sourceRecords.map((source) => (
+                      <span key={source.key}>{source.label}</span>
+                    ))}
+                  </div>
                 </div>
               </article>
             </div>
@@ -650,31 +717,35 @@ export function FieldGuideApp() {
           </div>
           <div className="dossier-screen-layout">
             <div className="dossier-screen-copy">
-              <div className="dossier-line">
-                <span className="lcars-badge">{activeMode.label}</span>
-                <span className="lcars-badge lcars-badge-soft">{activeRecord.canonTier} canon</span>
-                {activeRecord.descriptor ? <span className="lcars-badge lcars-badge-soft">{activeRecord.descriptor}</span> : null}
-              </div>
-              <p className="dossier-summary">{activeRecord.summary}</p>
-              {activeRecord.bioSections[0] ? <p className="dossier-bio-snippet">{truncateText(activeRecord.bioSections[0].body, 280)}</p> : null}
-              <div className="tag-row">
-                {activeRecord.tags.map((tag) => (
-                  <span className="tag-pill" key={tag}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <div className="dossier-actions">
-                <button type="button" onClick={() => openMainScreen("relations")}>
-                  Open map
-                </button>
-                <button type="button" onClick={() => openMainScreen("timeline")}>
-                  Open timeline
-                </button>
-                <button type="button" onClick={() => dockCompare(activeRecord.slug === "vulcan-species" ? "romulan-species" : "vulcan-species")}>
-                  Dock alternate
-                </button>
-              </div>
+              <article className="dossier-record-plate">
+                <div className="dossier-identity-rail">
+                  <span>{activeMode.label}</span>
+                  <strong>{activeRecord.canonTier} canon</strong>
+                  {activeRecord.descriptor ? <span>{activeRecord.descriptor}</span> : null}
+                </div>
+                <div className="dossier-summary-block">
+                  <p className="dossier-summary">{activeRecord.summary}</p>
+                  {activeRecord.bioSections[0] ? <p className="dossier-bio-snippet">{truncateText(activeRecord.bioSections[0].body, 280)}</p> : null}
+                </div>
+                <div className="dossier-tag-band">
+                  {activeRecord.tags.map((tag) => (
+                    <span className="tag-pill" key={tag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="dossier-action-band">
+                  <button type="button" onClick={() => openMainScreen("relations")}>
+                    Open map
+                  </button>
+                  <button type="button" onClick={() => openMainScreen("timeline")}>
+                    Open timeline
+                  </button>
+                  <button type="button" onClick={() => dockCompare(activeRecord.slug === "vulcan-species" ? "romulan-species" : "vulcan-species")}>
+                    Dock alternate
+                  </button>
+                </div>
+              </article>
             </div>
 
             <div className="dossier-screen-sidecar">
@@ -726,9 +797,10 @@ export function FieldGuideApp() {
               </div>
             </div>
           </div>
-          <div className="facts-ribbon">
-            {activeRecord.primaryFacts.slice(0, 3).map((fact) => (
+          <div className="facts-ribbon dossier-fact-band">
+            {activeRecord.primaryFacts.slice(0, 3).map((fact, index) => (
               <article className="fact-ribbon-card" key={fact.label}>
+                <span className="fact-slot-code">F-{index + 1}</span>
                 <span>{fact.label}</span>
                 <strong>{truncateText(fact.value, 82)}</strong>
               </article>
@@ -1006,7 +1078,7 @@ export function FieldGuideApp() {
           <div className="lcars-row field-guide-header-band">
             <div className="lcars-elbow left-bottom lcars-golden-tanoi-bg" />
             <div className="lcars-bar horizontal lcars-golden-tanoi-bg field-guide-header-bar">
-              <div className="lcars-title right">Trek Field Guide</div>
+              <div className="lcars-title right">FG-01 Archive</div>
             </div>
             <div className="lcars-bar horizontal right-end decorated lcars-hopbush-bg" />
           </div>
@@ -1014,7 +1086,8 @@ export function FieldGuideApp() {
           <div className="field-guide-header-grid">
             <div className="field-guide-id-box">
               <p className="eyebrow">LCARS access node</p>
-              <h1>Species / worlds / ships / factions / treaty records / cartography</h1>
+              <h1>Trek Field Guide</h1>
+              <p className="field-guide-id-taxonomy">Species / worlds / ships / factions / treaty records / cartography</p>
             </div>
 
             <div className="field-guide-status-grid">
