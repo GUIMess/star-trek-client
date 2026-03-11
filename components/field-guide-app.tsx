@@ -201,10 +201,27 @@ export function FieldGuideApp() {
   const launchRecords = sectionRecords;
   const activeSectionMeta = activeSection === "all" ? null : archiveSections.find((section) => section.type === activeSection) ?? null;
   const viewportLead = sectionRecords[0] ?? activeRecord;
+  const quickSearchResults = searchResults.slice(0, 3);
+  const quickTimelineEvents = activeRecord.timelineTrail.slice(0, 4);
+  const quickCitations = activeRecord.citations.slice(0, 3);
+  const quickLaunchRecords = launchRecords.slice(0, 4);
   const relatedTargets = activeRecord.relationTargets
     .map((relationship) => relationship.target)
     .filter((entity): entity is NonNullable<typeof entity> => entity !== null)
     .slice(0, 6);
+  const quickCompareTargets = comparison
+    ? comparison.contrast.slice(0, 3).map((item) => ({
+        key: item.label,
+        title: item.label,
+        subtitle: `${comparison.left.displayName}: ${item.left ?? "n/a"}`,
+        detail: `${comparison.right.displayName}: ${item.right ?? "n/a"}`,
+      }))
+    : relatedTargets.slice(0, 3).map((target) => ({
+        key: target.slug,
+        title: target.displayName,
+        subtitle: formatType(target.entityType),
+        detail: truncateText(target.summary, 64),
+      }));
   const scanBars = buildScanBars(activeRecord.primaryFacts);
   const activeMode = modeDeck.find((entry) => entry.id === mode) ?? modeDeck[0];
   const activeMainScreen = screenDeck.find((entry) => entry.id === mainScreen) ?? screenDeck[0];
@@ -726,55 +743,37 @@ export function FieldGuideApp() {
     if (sidePanel === "profile") {
       return (
         <motion.div className="side-panel-body" key={sidePanel} {...screenTransition}>
-          <div className="stack-list">
-            {activeRecord.primaryMedia ? (
-              <article className="side-row-card side-media-card">
-                <div className="side-media-frame">
-                  <img alt={activeRecord.primaryMedia.alt} src={activeRecord.primaryMedia.src} />
-                </div>
-                <div className="side-media-copy">
-                  <span>{activeRecord.primaryMedia.title}</span>
-                  <strong>{activeRecord.displayName}</strong>
-                  <p>{activeRecord.primaryMedia.caption}</p>
-                </div>
-              </article>
-            ) : null}
-            {activeRecord.bioSections.map((section) => (
-              <article className="side-row-card" key={section.heading}>
-                <span>{section.heading}</span>
-                <p>{section.body}</p>
-              </article>
-            ))}
-            {Object.entries(activeRecord.profile).map(([label, value]) => (
-              <article className="side-row-card" key={label}>
-                <span>{formatLabel(label)}</span>
-                <strong>{value}</strong>
-              </article>
-            ))}
-            {activeRecord.cartography ? (
-              <article className="side-row-card">
-                <span>Cartography</span>
-                <strong>{activeRecord.cartography.quadrant}</strong>
-                <p>
-                  {activeRecord.cartography.sector} / {activeRecord.cartography.gridLabel}
-                </p>
-              </article>
-            ) : null}
-            <article className="side-row-card">
-              <span>Diplomatic posture</span>
-              <strong>{activeRecord.diplomaticPosture}</strong>
-            </article>
-            <article className="side-row-card">
-              <span>Tags</span>
-              <div className="tag-row">
-                {activeRecord.tags.map((tag) => (
-                  <span className="tag-pill" key={tag}>
-                    {tag}
-                  </span>
+          <article className="side-readout-card">
+            <p className="eyebrow">Profile snapshot</p>
+            <strong>{activeRecord.displayName}</strong>
+            <p>{truncateText(activeRecord.bioSections[0]?.body ?? activeRecord.summary, 148)}</p>
+          </article>
+          <article className="side-readout-card">
+            <p className="eyebrow">Identity markers</p>
+            <ul className="readout-list">
+              {Object.entries(activeRecord.profile)
+                .slice(0, 3)
+                .map(([label, value]) => (
+                  <li key={label}>
+                    {formatLabel(label)}: {value}
+                  </li>
                 ))}
-              </div>
-            </article>
-          </div>
+            </ul>
+          </article>
+          <article className="side-readout-card">
+            <p className="eyebrow">Profile actions</p>
+            <div className="stack-buttons">
+              <button type="button" onClick={() => openMainScreen("dossier")}>
+                Dossier
+              </button>
+              <button type="button" onClick={() => openMainScreen("sources")}>
+                Sources
+              </button>
+              <button type="button" onClick={() => openMainScreen("relations")}>
+                Map
+              </button>
+            </div>
+          </article>
         </motion.div>
       );
     }
@@ -793,8 +792,8 @@ export function FieldGuideApp() {
             />
           </label>
           <div className="search-results">
-            {searchResults.length ? (
-              searchResults.map((result) => (
+            {quickSearchResults.length ? (
+              quickSearchResults.map((result) => (
                 <article className="search-result-card" key={result.slug}>
                   <button type="button" onClick={() => focusEntity(result.slug, "dossier")}>
                     <strong>{result.displayName}</strong>
@@ -827,7 +826,7 @@ export function FieldGuideApp() {
       return (
         <motion.div className="side-panel-body" key={sidePanel} {...screenTransition}>
           <div className="launch-list">
-            {launchRecords.map((record) => (
+            {quickLaunchRecords.map((record) => (
               <article className="launch-side-card" key={record.slug}>
                 <button type="button" onClick={() => focusEntity(record.slug, "dossier")}>
                   <span>{record.entityType}</span>
@@ -854,12 +853,12 @@ export function FieldGuideApp() {
         <article className="side-readout-card">
           <p className="eyebrow">Mode readout</p>
           <strong>{activeMode.label}</strong>
-          <p>{activeMode.summary}</p>
+          <p>{truncateText(activeMode.summary, 112)}</p>
         </article>
         <article className="side-readout-card">
-          <p className="eyebrow">Operational notes</p>
+          <p className="eyebrow">Center viewport</p>
           <ul className="readout-list">
-            {activeRecord.readout.map((line) => (
+            {activeRecord.readout.slice(0, 3).map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ul>
@@ -875,6 +874,9 @@ export function FieldGuideApp() {
             </button>
             <button type="button" onClick={() => openMainScreen("timeline")}>
               Era trail
+            </button>
+            <button type="button" onClick={() => openMainScreen("sources")}>
+              Sources
             </button>
             <button type="button" onClick={() => setSidePanel("search")}>
               Archive jump
@@ -899,21 +901,24 @@ export function FieldGuideApp() {
     if (lowerPanel === "compare") {
       return (
         <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
-          {comparison ? (
-            <div className="lower-compare-grid">
-              {comparison.contrast.slice(0, 4).map((item) => (
-                <article className="lower-card" key={item.label}>
-                  <span>{item.label}</span>
-                  <strong>{comparison.left.displayName}</strong>
-                  <p>{item.left ?? "n/a"}</p>
-                  <strong>{comparison.right.displayName}</strong>
-                  <p>{item.right ?? "n/a"}</p>
+          <div className="lower-compare-grid">
+            {quickCompareTargets.length ? (
+              quickCompareTargets.map((item) => (
+                <article className="lower-card" key={item.key}>
+                  <span>{comparison ? "Contrast" : "Dock candidate"}</span>
+                  <strong>{item.title}</strong>
+                  <p>{item.subtitle}</p>
+                  <p>{item.detail}</p>
                 </article>
-              ))}
-            </div>
-          ) : (
-            <p className="screen-placeholder">Dock another dossier to activate the lower compare strip.</p>
-          )}
+              ))
+            ) : (
+              <article className="lower-card">
+                <span>Compare</span>
+                <strong>No dock target ready.</strong>
+                <p>Use relation map or launch buttons to pair a second dossier.</p>
+              </article>
+            )}
+          </div>
         </motion.div>
       );
     }
@@ -922,12 +927,12 @@ export function FieldGuideApp() {
       return (
         <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
           <div className="lower-source-grid">
-            {activeRecord.citations.length ? (
-              activeRecord.citations.map((citation) => (
+            {quickCitations.length ? (
+              quickCitations.map((citation) => (
                 <article className="lower-card citation-lower-card" key={`${citation.label}-${citation.url}`}>
                   <span>{citation.source?.label ?? "Archive source"}</span>
                   <strong>{citation.label}</strong>
-                  <p>{citation.note}</p>
+                  <p>{truncateText(citation.note, 92)}</p>
                   <a href={citation.url} rel="noreferrer" target="_blank">
                     Open source
                   </a>
@@ -949,7 +954,7 @@ export function FieldGuideApp() {
       return (
         <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
           <div className="lower-launch-grid">
-            {launchRecords.map((record) => (
+            {quickLaunchRecords.map((record) => (
               <article className="lower-card lower-launch-card" key={record.slug}>
                 <button type="button" onClick={() => focusEntity(record.slug, "dossier")}>
                   <span>{record.entityType}</span>
@@ -973,12 +978,12 @@ export function FieldGuideApp() {
     return (
       <motion.div className="lower-panel-body" key={lowerPanel} {...screenTransition}>
         <div className="lower-timeline-grid">
-          {activeRecord.timelineTrail.length ? (
-            activeRecord.timelineTrail.map((event) => (
+          {quickTimelineEvents.length ? (
+            quickTimelineEvents.map((event) => (
               <article className="lower-card" key={`${event.eraLabel}-${event.headline}`}>
                 <span>{event.eraLabel}</span>
                 <strong>{event.headline}</strong>
-                <p>{event.detail}</p>
+                <p>{truncateText(event.detail, 88)}</p>
               </article>
             ))
           ) : (
@@ -1146,14 +1151,8 @@ export function FieldGuideApp() {
                 </div>
               </div>
 
-              <div className="field-guide-screen-head">
-                <div className="field-guide-active-box">
-                  <p className="eyebrow">{viewportEyebrow}</p>
-                  <h2>{viewportTitle}</h2>
-                  <p>{viewportSubline}</p>
-                </div>
-
-                <div className="field-guide-tab-strip">
+              {mainScreen === "catalog" ? (
+                <div className="field-guide-screen-nav">
                   {screenDeck.map((entry) => (
                     <button
                       className={clsx(
@@ -1172,7 +1171,35 @@ export function FieldGuideApp() {
                     </button>
                   ))}
                 </div>
-              </div>
+              ) : (
+                <div className="field-guide-screen-head">
+                  <div className="field-guide-active-box">
+                    <p className="eyebrow">{viewportEyebrow}</p>
+                    <h2>{viewportTitle}</h2>
+                    <p>{viewportSubline}</p>
+                  </div>
+
+                  <div className="field-guide-tab-strip">
+                    {screenDeck.map((entry) => (
+                      <button
+                        className={clsx(
+                          "lcars-element button rounded field-guide-tab-button",
+                          entry.tone,
+                          mainScreen === entry.id && "is-active"
+                        )}
+                        key={entry.id}
+                        type="button"
+                        onClick={() => openMainScreen(entry.id)}
+                      >
+                        <div className="field-guide-shell-button-code">{entry.code}</div>
+                        <div className="field-guide-shell-button-copy">
+                          <strong>{entry.label}</strong>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="field-guide-screen-body">
                 <AnimatePresence mode="wait" initial={false}>

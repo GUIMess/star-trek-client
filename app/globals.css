@@ -2560,7 +2560,7 @@ body {
 /* LCARS shell reset: use real bars/elbows/elements for the outer frame. */
 .archive-root {
   min-height: 100dvh;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .field-guide-shell {
@@ -2570,6 +2570,7 @@ body {
   grid-template-rows: auto minmax(0, 1fr);
   gap: 0.42rem;
   width: min(calc(100vw - 1rem), 1760px);
+  height: 100dvh;
   min-height: 100dvh;
   margin: 0 auto;
   padding: 0.4rem;
@@ -2682,8 +2683,9 @@ body {
   grid-template-columns: 13.5rem minmax(0, 1fr) 12rem;
   grid-template-areas: "sidebar main aux";
   gap: 0.34rem;
+  height: 100%;
   min-height: 0;
-  align-items: start;
+  align-items: stretch;
 }
 
 .field-guide-sidebar {
@@ -2696,12 +2698,15 @@ body {
 .field-guide-main {
   grid-area: main;
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   gap: 0.42rem;
+  height: 100%;
   min-width: 0;
 }
 
 .field-guide-aux {
   grid-area: aux;
+  height: 100%;
   min-width: 0;
 }
 
@@ -2716,6 +2721,16 @@ body {
   display: grid;
   gap: 0.3rem;
   min-height: 0;
+}
+
+.field-guide-main-frame {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  align-content: start;
+}
+
+.field-guide-aux-frame {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  align-content: start;
 }
 
 .field-guide-block-body,
@@ -2817,7 +2832,17 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.5rem;
-  align-items: end;
+  align-items: start;
+}
+
+.field-guide-screen-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+}
+
+.field-guide-screen-nav .field-guide-tab-button {
+  width: auto;
 }
 
 .field-guide-active-box {
@@ -2825,10 +2850,10 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 0.42rem solid #fc6;
   padding: 0.62rem 0.84rem 0.58rem;
-  min-height: 4.7rem;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .field-guide-active-box .eyebrow {
@@ -2850,7 +2875,7 @@ body {
 .field-guide-active-box p:last-child {
   margin: 0.18rem 0 0;
   color: var(--text-muted);
-  font-size: 0.74rem;
+  font-size: 0.68rem;
 }
 
 .field-guide-tab-strip {
@@ -2894,12 +2919,17 @@ body {
 .field-guide-screen-body,
 .field-guide-lower-body,
 .field-guide-aux-body {
-  overflow: auto;
+  overflow: hidden;
   padding-right: 0.15rem;
 }
 
 .field-guide-screen-body {
   min-height: 20rem;
+  height: 100%;
+}
+
+.field-guide-lower-frame {
+  display: none;
 }
 
 .field-guide-lower-body {
@@ -2949,6 +2979,9 @@ body {
 
 .field-guide-shell .screen-panel {
   padding: 0.9rem 1rem;
+  align-content: start;
+  grid-auto-rows: max-content;
+  overflow: hidden;
 }
 
 .field-guide-shell .screen-panel::after,
@@ -2970,6 +3003,12 @@ body {
   overflow: visible;
 }
 
+.field-guide-shell .side-panel-body,
+.field-guide-shell .lower-panel-body {
+  display: grid;
+  gap: 0.42rem;
+}
+
 .field-guide-shell .dossier-screen-layout,
 .field-guide-shell .atlas-screen-layout,
 .field-guide-shell .atlas-card-grid,
@@ -2989,11 +3028,13 @@ body {
 .field-guide-shell .atlas-screen-layout {
   display: grid;
   grid-template-columns: minmax(15rem, 18rem) minmax(0, 1fr);
+  align-content: start;
 }
 
 .field-guide-shell .atlas-card-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
 }
 
 .field-guide-shell .atlas-preview-card,
@@ -3121,11 +3162,28 @@ body {
 }
 
 @media (max-width: 1240px), (max-height: 860px) {
+  .archive-root {
+    overflow: auto;
+  }
+
+  .field-guide-shell {
+    height: auto;
+    min-height: 100dvh;
+  }
+
   .field-guide-body {
     grid-template-columns: 15rem minmax(0, 1fr);
     grid-template-areas:
       "sidebar main"
       "sidebar aux";
+  }
+
+  .field-guide-main {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .field-guide-lower-frame {
+    display: grid;
   }
 
   .field-guide-tab-strip {
@@ -3137,6 +3195,7 @@ body {
 @media (max-width: 940px), (max-height: 720px) {
   .field-guide-shell {
     width: min(calc(100vw - 0.5rem), 100%);
+    height: auto;
     padding: 0.25rem;
   }
 
