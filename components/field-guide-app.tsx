@@ -1,13 +1,10 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { startTransition, useDeferredValue, useEffect, useState, type CSSProperties } from "react";
+import { startTransition, useDeferredValue, useEffect, useState } from "react";
 import {
   archiveSections,
   archiveStats,
-  buildComparison,
-  defaultCompareSlug,
   defaultPrimarySlug,
   featuredRecords,
   getHydratedEntity,
@@ -17,67 +14,94 @@ import {
   type HydratedEntity,
 } from "../lib/field-guide";
 
-type DetailPanel = "overview" | "timeline" | "relations" | "sources" | "compare";
+type Screen = "briefing" | "records" | "timeline" | "sources";
+
+const screenDeck: Array<{
+  id: Screen;
+  code: string;
+  label: string;
+  tone: string;
+}> = [
+  { id: "briefing", code: "home", label: "Briefing", tone: "lcars-classic-tone-bluey" },
+  { id: "records", code: "menu", label: "Records", tone: "lcars-classic-tone-orange" },
+  { id: "timeline", code: "news", label: "Timeline", tone: "lcars-classic-tone-gold" },
+  { id: "sources", code: "comms", label: "Sources", tone: "lcars-classic-tone-red" },
+];
 
 const modeDeck: Array<{
   id: ArchiveMode;
   code: string;
   label: string;
   summary: string;
-  accent: string;
-  accentSoft: string;
-  accentAlt: string;
-  accentMuted: string;
+  tone: string;
 }> = [
   {
     id: "field-guide",
     code: "FG-01",
     label: "Field Guide",
-    summary: "Archive-first framing for species, worlds, factions, ships, and incidents.",
-    accent: "#f49e2f",
-    accentSoft: "#b58cff",
-    accentAlt: "#ff8d63",
-    accentMuted: "#8d96ff",
+    summary: "Archive-first lens for species, worlds, factions, ships, and incidents.",
+    tone: "lcars-classic-tone-violet",
   },
   {
     id: "first-contact",
     code: "FC-02",
     label: "First Contact",
-    summary: "Surfaces protocol, caution, and cultural posture for first-look briefings.",
-    accent: "#f4e267",
-    accentSoft: "#89a3ff",
-    accentAlt: "#f9a24f",
-    accentMuted: "#d794ff",
+    summary: "Pushes protocol, caution, and cultural baseline to the front of the record.",
+    tone: "lcars-classic-tone-bluey",
   },
   {
     id: "diplomatic",
     code: "DP-03",
     label: "Diplomatic",
-    summary: "Rebalances the archive around negotiation posture, treaties, and alliances.",
-    accent: "#c48bff",
-    accentSoft: "#ffb073",
-    accentAlt: "#f57b6a",
-    accentMuted: "#88b4ff",
+    summary: "Weights the record around alliances, posture, and treaty context.",
+    tone: "lcars-classic-tone-almond",
   },
   {
     id: "threat",
     code: "TH-04",
     label: "Threat",
-    summary: "Tightens the view around pressure points, operational caution, and risk.",
-    accent: "#ff7a66",
-    accentSoft: "#f29f3c",
-    accentAlt: "#c48bff",
-    accentMuted: "#8e95ff",
+    summary: "Frames the record around pressure points, escalation, and operational risk.",
+    tone: "lcars-classic-tone-red",
   },
 ];
 
-const panelDeck: Array<{ id: DetailPanel; code: string; label: string }> = [
-  { id: "overview", code: "01", label: "Overview" },
-  { id: "timeline", code: "02", label: "Timeline" },
-  { id: "relations", code: "03", label: "Relations" },
-  { id: "sources", code: "04", label: "Sources" },
-  { id: "compare", code: "05", label: "Compare" },
+const dataCascade = [
+  ["93", "1853", "24109", "7", "7024", "322", "4149"],
+  ["21509", "68417", "80", "2048", "319825", "46233", "30986"],
+  ["585101", "25403", "31219", "752", "0604", "21048", "534082"],
+  ["2107853", "12201972", "24487255", "30412", "98", "4024161", "41520257"],
+  ["33", "56", "04", "69", "41", "15", "25"],
+  ["0223", "688", "28471", "21366", "8654", "31", "1984"],
+  ["633", "51166", "41699", "6188", "15033", "21094", "32881"],
+  ["406822", "81205", "91007", "38357", "110", "2041", "57104"],
+  ["12073", "688", "21982", "20254", "55", "38447", "26921"],
+  ["21604", "15421", "25", "3808", "582031", "62311", "85799"],
 ];
+
+const sectionToneDeck = [
+  "lcars-classic-tone-violet",
+  "lcars-classic-tone-red",
+  "lcars-classic-tone-orange",
+  "lcars-classic-tone-almond",
+  "lcars-classic-tone-bluey",
+  "lcars-classic-tone-peach",
+  "lcars-classic-tone-gold",
+];
+
+function buildStardate() {
+  const now = new Date();
+  const anchorYear = 2025;
+  const startOfYear = Date.UTC(now.getUTCFullYear(), 0, 1);
+  const endOfYear = Date.UTC(now.getUTCFullYear() + 1, 0, 1);
+  const yearProgress = (now.getTime() - startOfYear) / (endOfYear - startOfYear);
+  return (78000 + (now.getUTCFullYear() - anchorYear) * 1000 + yearProgress * 1000).toFixed(1);
+}
+
+function hydrateSlugs(slugs: string[], mode: ArchiveMode) {
+  return slugs
+    .map((slug) => getHydratedEntity(slug, mode))
+    .filter((entity): entity is HydratedEntity => entity !== null);
+}
 
 function formatType(value: string) {
   return value
@@ -92,49 +116,30 @@ function formatThreat(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function formatConfidence(value: number) {
-  return `${Math.round(value * 100)}% confidence`;
-}
-
-function buildStardate() {
-  const now = new Date();
-  const anchorYear = 2025;
-  const startOfYear = Date.UTC(now.getUTCFullYear(), 0, 1);
-  const endOfYear = Date.UTC(now.getUTCFullYear() + 1, 0, 1);
-  const yearProgress = (now.getTime() - startOfYear) / (endOfYear - startOfYear);
-  return (78000 + (now.getUTCFullYear() - anchorYear) * 1000 + yearProgress * 1000).toFixed(1);
-}
-
-function hydrateSlugs(slugs: string[], mode: ArchiveMode) {
-  return slugs
-    .map((slug) => getHydratedEntity(slug, mode))
-    .filter((record): record is HydratedEntity => record !== null);
-}
-
 function buildSectionCode(index: number) {
-  return `${String(index + 2).padStart(2, "0")}-${String((index + 1) * 173).padStart(4, "0")}`;
+  return `${String(index + 3).padStart(2, "0")}-${String((index + 1) * 173).padStart(5, "0")}`;
 }
 
 function buildRecordCode(index: number) {
-  return `${String(index + 3).padStart(2, "0")}-${String((index + 1) * 917).padStart(4, "0")}`;
+  return `${String(index + 5).padStart(2, "0")}-${String((index + 1) * 917).padStart(5, "0")}`;
 }
 
-function buildSystemStats() {
-  return [
-    { label: "Archive", value: archiveStats.entityCount, detail: "indexed records" },
-    { label: "Relations", value: archiveStats.relationCount, detail: "cross-links" },
-    { label: "Sources", value: archiveStats.citationCount, detail: "citations" },
-    { label: "Media", value: archiveStats.mediaCount, detail: "assets cached" },
-  ];
+function buildEntryCode(record: HydratedEntity) {
+  const seed = record.slug.length * 137 + record.timelineTrail.length * 31 + record.primaryFacts.length * 19;
+  const left = String(20 + (seed % 80)).padStart(2, "0");
+  const right = String(100 + (seed % 900)).padStart(3, "0");
+  return `${left}${right}`;
+}
+
+function buildPrimaryFactsCopy(record: HydratedEntity) {
+  return record.primaryFacts.slice(0, 4).map((fact) => `${fact.label}: ${fact.value}`);
 }
 
 export function FieldGuideApp() {
-  const reducedMotion = useReducedMotion();
   const [mode, setMode] = useState<ArchiveMode>("field-guide");
-  const [panel, setPanel] = useState<DetailPanel>("overview");
+  const [screen, setScreen] = useState<Screen>("briefing");
   const [activeSection, setActiveSection] = useState<string | "all">("all");
   const [activeSlug, setActiveSlug] = useState(defaultPrimarySlug);
-  const [compareSlug, setCompareSlug] = useState(defaultCompareSlug);
   const [query, setQuery] = useState("");
   const [stardate, setStardate] = useState("--.--");
   const deferredQuery = useDeferredValue(query);
@@ -151,62 +156,54 @@ export function FieldGuideApp() {
     featuredRecords.map((record) => record.slug),
     mode
   );
-  const sectionDeck =
-    activeSection === "all"
-      ? featuredDeck
-      : hydrateSlugs(
-          listEntitiesByType(activeSection).map((entity) => entity.slug),
-          mode
-        ).slice(0, 8);
   const activeRecord = getHydratedEntity(activeSlug, mode) ?? featuredDeck[0];
   const activeSectionMeta =
     activeSection === "all"
       ? null
       : archiveSections.find((section) => section.type === activeSection) ?? null;
-  const filteredResults = deferredQuery.trim()
+  const sectionRecords =
+    activeSection === "all"
+      ? featuredDeck
+      : hydrateSlugs(
+          listEntitiesByType(activeSection).map((entity) => entity.slug),
+          mode
+        ).slice(0, 7);
+  const visibleRecords = deferredQuery.trim()
     ? hydrateSlugs(
         searchArchive(deferredQuery)
           .map((result) => result.slug)
           .filter((slug) => slug !== activeSlug),
         mode
       )
-    : sectionDeck.filter((record) => record.slug !== activeSlug);
+    : sectionRecords.filter((record) => record.slug !== activeSlug);
   const relatedRecords = hydrateSlugs(
     activeRecord.relationTargets.map((relationship) => relationship.targetSlug),
     mode
   )
     .filter((record) => record.slug !== activeRecord.slug)
-    .slice(0, 6);
-  const fallbackCompare =
-    relatedRecords[0] ?? featuredDeck.find((record) => record.slug !== activeRecord.slug) ?? null;
-  const resolvedCompareSlug =
-    compareSlug !== activeRecord.slug ? compareSlug : fallbackCompare?.slug ?? defaultCompareSlug;
-  const compareRecord =
-    resolvedCompareSlug && resolvedCompareSlug !== activeRecord.slug
-      ? getHydratedEntity(resolvedCompareSlug, mode)
-      : null;
-  const comparison =
-    resolvedCompareSlug && resolvedCompareSlug !== activeRecord.slug
-      ? buildComparison(activeRecord.slug, resolvedCompareSlug)
-      : null;
-  const systemStats = buildSystemStats();
-  const heroNotes = activeRecord.readout.slice(0, 4);
-  const panelKey = `${panel}-${activeRecord.slug}-${resolvedCompareSlug}-${mode}`;
-  const themeStyle = {
-    ["--lcars-accent" as const]: activeMode.accent,
-    ["--lcars-accent-soft" as const]: activeMode.accentSoft,
-    ["--lcars-accent-alt" as const]: activeMode.accentAlt,
-    ["--lcars-accent-muted" as const]: activeMode.accentMuted,
-  } as CSSProperties;
+    .slice(0, 4);
+  const primaryFactsCopy = buildPrimaryFactsCopy(activeRecord);
+  const contentKey = `${screen}-${mode}-${activeRecord.slug}-${activeSection}`;
 
   function focusEntity(slug: string) {
     startTransition(() => {
       const entity = getHydratedEntity(slug, mode);
       setActiveSlug(slug);
-      setPanel("overview");
+      setScreen("briefing");
       setQuery("");
       if (entity) {
         setActiveSection(entity.entityType);
+      }
+    });
+  }
+
+  function switchSection(section: string | "all", leadSlug?: string) {
+    startTransition(() => {
+      setActiveSection(section);
+      setScreen("records");
+      setQuery("");
+      if (leadSlug) {
+        setActiveSlug(leadSlug);
       }
     });
   }
@@ -217,416 +214,297 @@ export function FieldGuideApp() {
     });
   }
 
-  function switchSection(section: string | "all", leadSlug?: string) {
-    startTransition(() => {
-      setActiveSection(section);
-      setPanel("overview");
-      setQuery("");
-      if (leadSlug) {
-        setActiveSlug(leadSlug);
-      }
-    });
-  }
-
-  function openCompare(slug: string) {
-    if (slug === activeRecord.slug) return;
-    startTransition(() => {
-      setCompareSlug(slug);
-      setPanel("compare");
-    });
-  }
-
-  function renderPanel() {
-    if (panel === "timeline") {
+  function renderMainContent() {
+    if (screen === "records") {
       return (
-        <div className="lcars-log-panel-grid">
-          <section className="lcars-log-card">
-            <div className="lcars-log-card-head">
-              <span>Timeline</span>
-              <strong>{activeRecord.timelineTrail.length} entries</strong>
-            </div>
-            {activeRecord.timelineTrail.length ? (
-              <div className="lcars-log-event-list">
-                {activeRecord.timelineTrail.map((event) => (
-                  <article className="lcars-log-event-row" key={`${event.sortKey}-${event.headline}`}>
-                    <p className="lcars-log-event-era">{event.eraLabel}</p>
-                    <h3>{event.headline}</h3>
-                    <p>{event.detail}</p>
-                    <span>{event.source?.label ?? "Source pending"}</span>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="lcars-log-empty">Timeline detail is still being expanded for this record.</p>
-            )}
-          </section>
-        </div>
-      );
-    }
+        <>
+          <h2>{activeSectionMeta?.label ?? "Featured deck"}</h2>
+          <p>
+            Browse the current archive deck, jump directly to a live record, or search the wider index
+            without leaving the frame.
+          </p>
 
-    if (panel === "relations") {
-      return (
-        <div className="lcars-log-panel-grid lcars-log-panel-grid-wide">
-          <section className="lcars-log-card">
-            <div className="lcars-log-card-head">
-              <span>Relationship graph</span>
-              <strong>{activeRecord.relationTargets.length} live links</strong>
-            </div>
-            {activeRecord.relationTargets.length ? (
-              <div className="lcars-log-relation-list">
-                {activeRecord.relationTargets.map((relationship) => (
-                  <article className="lcars-log-relation-row" key={`${relationship.type}-${relationship.targetSlug}`}>
-                    <div>
-                      <p className="lcars-log-relation-type">{relationship.typeLabel}</p>
-                      <h3>{relationship.target?.displayName ?? relationship.targetSlug.replaceAll("-", " ")}</h3>
-                      <p>{relationship.description}</p>
-                    </div>
-                    <div className="lcars-log-relation-actions">
-                      {relationship.target ? (
-                        <>
-                          <button onClick={() => focusEntity(relationship.target!.slug)} type="button">
-                            Open record
-                          </button>
-                          <button onClick={() => openCompare(relationship.target!.slug)} type="button">
-                            Compare
-                          </button>
-                        </>
-                      ) : null}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="lcars-log-empty">Cross-links are not available for this entry yet.</p>
-            )}
-          </section>
-        </div>
-      );
-    }
+          <div className="lcars-classic-search-row">
+            <label className="lcars-classic-search-label" htmlFor="archive-search">
+              Search archive
+            </label>
+            <input
+              className="lcars-classic-search-input"
+              id="archive-search"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Vulcan, Khitomer, Borg..."
+              type="search"
+              value={query}
+            />
+          </div>
 
-    if (panel === "sources") {
-      return (
-        <div className="lcars-log-panel-grid lcars-log-panel-grid-split">
-          <section className="lcars-log-card">
-            <div className="lcars-log-card-head">
-              <span>Source trail</span>
-              <strong>{activeRecord.sourceTrail.length} supporting sources</strong>
-            </div>
-            <div className="lcars-log-source-list">
-              {activeRecord.sourceTrail.map((source) => (
-                <article className="lcars-log-source-row" key={source.key}>
-                  <div>
-                    <p className="lcars-log-source-type">{source.sourceType}</p>
-                    <h3>{source.label}</h3>
+          <div className="lcars-classic-records-list">
+            {visibleRecords.length ? (
+              visibleRecords.slice(0, 6).map((record, index) => (
+                <article className="lcars-classic-record-row" key={record.slug}>
+                  <div className="lcars-classic-record-code">{buildRecordCode(index)}</div>
+                  <div className="lcars-classic-record-copy">
+                    <h3>{record.displayName}</h3>
+                    <p>{record.summary}</p>
                   </div>
-                  <div className="lcars-log-source-meta">
-                    <span>{Math.round(source.canonWeight * 100)}% weight</span>
-                    {source.url ? (
-                      <a href={source.url} rel="noreferrer" target="_blank">
-                        Open
-                      </a>
-                    ) : (
-                      <span>Internal only</span>
-                    )}
-                  </div>
+                  <button className="lcars-classic-inline-button" onClick={() => focusEntity(record.slug)} type="button">
+                    open record
+                  </button>
                 </article>
+              ))
+            ) : (
+              <p>No matching records in the current archive view.</p>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    if (screen === "timeline") {
+      return (
+        <>
+          <h2>Chronology trace</h2>
+          <p>
+            Timeline events stay in one reading column so the eye moves through the log the way an LCARS
+            article does, instead of bouncing between panels.
+          </p>
+
+          {activeRecord.timelineTrail.length ? (
+            <div className="lcars-classic-block-list">
+              {activeRecord.timelineTrail.map((event) => (
+                <section className="lcars-classic-copy-block" key={`${event.sortKey}-${event.headline}`}>
+                  <p className="lcars-classic-kicker">{event.eraLabel}</p>
+                  <h3>{event.headline}</h3>
+                  <p>{event.detail}</p>
+                </section>
               ))}
             </div>
-          </section>
-
-          <section className="lcars-log-card">
-            <div className="lcars-log-card-head">
-              <span>Linked citations</span>
-              <strong>{activeRecord.citations.length} references</strong>
-            </div>
-            {activeRecord.citations.length ? (
-              <div className="lcars-log-source-list">
-                {activeRecord.citations.map((citation) => (
-                  <article className="lcars-log-source-row" key={citation.label}>
-                    <div>
-                      <p className="lcars-log-source-type">{citation.source?.label ?? citation.sourceKey}</p>
-                      <h3>{citation.label}</h3>
-                      <p>{citation.note}</p>
-                    </div>
-                    <div className="lcars-log-source-meta">
-                      <a href={citation.url} rel="noreferrer" target="_blank">
-                        Visit source
-                      </a>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="lcars-log-empty">No outward citations have been attached to this record yet.</p>
-            )}
-          </section>
-        </div>
+          ) : (
+            <p>This entry does not yet have a deeper chronology trail attached to it.</p>
+          )}
+        </>
       );
     }
 
-    if (panel === "compare") {
+    if (screen === "sources") {
       return (
-        <div className="lcars-log-panel-grid">
-          <section className="lcars-log-card">
-            <div className="lcars-log-card-head">
-              <span>Comparison target</span>
-              <strong>{compareRecord?.displayName ?? "Select a related record"}</strong>
-            </div>
-            <div className="lcars-log-chip-grid">
-              {relatedRecords.map((record) => (
-                <button
-                  className={clsx("lcars-log-chip-button", resolvedCompareSlug === record.slug && "is-active")}
-                  key={record.slug}
-                  onClick={() => openCompare(record.slug)}
-                  type="button"
-                >
-                  <span>{formatType(record.entityType)}</span>
-                  <strong>{record.displayName}</strong>
-                </button>
-              ))}
-            </div>
+        <>
+          <h2>Source trail</h2>
+          <p>
+            Every supporting source and outward citation is kept in the same article flow instead of being
+            scattered across a separate stats dashboard.
+          </p>
 
-            {comparison && compareRecord ? (
-              <div className="lcars-log-compare-layout">
-                <article className="lcars-log-compare-hero">
-                  <p>{activeRecord.displayName}</p>
-                  <h3>against {compareRecord.displayName}</h3>
-                  <p>{compareRecord.summary}</p>
-                </article>
+          <div className="lcars-classic-block-list">
+            {activeRecord.sourceTrail.map((source) => (
+              <section className="lcars-classic-copy-block" key={source.key}>
+                <p className="lcars-classic-kicker">{source.sourceType}</p>
+                <h3>{source.label}</h3>
+                <p>Canon weight {Math.round(source.canonWeight * 100)}%.</p>
+                {source.url ? (
+                  <p>
+                    <a href={source.url} rel="noreferrer" target="_blank">
+                      Open source record
+                    </a>
+                  </p>
+                ) : null}
+              </section>
+            ))}
 
-                <div className="lcars-log-compare-rows">
-                  {comparison.contrast.map((row) => (
-                    <article className="lcars-log-compare-row" key={row.label}>
-                      <span>{row.label}</span>
-                      <div>
-                        <strong>{comparison.left.displayName}</strong>
-                        <p>{row.left ?? "No entry"}</p>
-                      </div>
-                      <div>
-                        <strong>{comparison.right.displayName}</strong>
-                        <p>{row.right ?? "No entry"}</p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <p className="lcars-log-empty">Choose a linked record to compare the archive brief side by side.</p>
-            )}
-          </section>
-        </div>
+            {activeRecord.citations.map((citation) => (
+              <section className="lcars-classic-copy-block" key={citation.label}>
+                <p className="lcars-classic-kicker">{citation.source?.label ?? citation.sourceKey}</p>
+                <h3>{citation.label}</h3>
+                <p>{citation.note}</p>
+                <p>
+                  <a href={citation.url} rel="noreferrer" target="_blank">
+                    Visit citation
+                  </a>
+                </p>
+              </section>
+            ))}
+          </div>
+        </>
       );
     }
 
     return (
-      <div className="lcars-log-panel-grid lcars-log-panel-grid-overview">
-        <section className="lcars-log-card lcars-log-card-emphasis">
-          <div className="lcars-log-card-head">
-            <span>Operator readout</span>
-            <strong>{activeRecord.descriptor ?? activeRecord.displayName}</strong>
-          </div>
-          <ul className="lcars-log-note-list">
-            {heroNotes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        </section>
+      <>
+        <h2>{activeRecord.descriptor ?? "Archive abstract"}</h2>
+        <p>{activeRecord.summary}</p>
 
-        <section className="lcars-log-card">
-          <div className="lcars-log-card-head">
-            <span>Primary facts</span>
-            <strong>{activeRecord.primaryFacts.length} high-priority signals</strong>
-          </div>
-          <div className="lcars-log-fact-list">
-            {activeRecord.primaryFacts.map((fact) => (
-              <article className="lcars-log-fact-row" key={fact.label}>
-                <div>
-                  <p>{fact.label}</p>
-                  <h3>{fact.value}</h3>
-                </div>
-                <span>{formatConfidence(fact.confidence)}</span>
-              </article>
-            ))}
-          </div>
-        </section>
+        <h3>Operational read</h3>
+        <p>{activeRecord.readout.join(" ")}</p>
 
-        <section className="lcars-log-card">
-          <div className="lcars-log-card-head">
-            <span>Profile</span>
-            <strong>{formatType(activeRecord.entityType)}</strong>
-          </div>
-          <div className="lcars-log-profile-list">
-            <article className="lcars-log-profile-row">
-              <span>Threat</span>
-              <strong>{formatThreat(activeRecord.threatLevel)}</strong>
-            </article>
-            <article className="lcars-log-profile-row">
-              <span>Canon tier</span>
-              <strong>{activeRecord.canonTier}</strong>
-            </article>
-            <article className="lcars-log-profile-row">
-              <span>Posture</span>
-              <strong>{activeRecord.diplomaticPosture}</strong>
-            </article>
-            {Object.entries(activeRecord.profile).map(([label, value]) => (
-              <article className="lcars-log-profile-row" key={label}>
-                <span>{formatType(label)}</span>
-                <strong>{value}</strong>
-              </article>
-            ))}
-          </div>
-        </section>
+        <h3>Primary factors</h3>
+        <ul className="lcars-classic-list">
+          {primaryFactsCopy.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
 
-        <section className="lcars-log-card">
-          <div className="lcars-log-card-head">
-            <span>Briefing</span>
-            <strong>{activeRecord.bioSections[0]?.heading ?? "Archive summary"}</strong>
-          </div>
-          <div className="lcars-log-copy-stack">
-            {(activeRecord.bioSections.length ? activeRecord.bioSections : [{ heading: "Summary", body: activeRecord.summary }])
-              .slice(0, 2)
-              .map((section) => (
-                <article key={section.heading}>
-                  <p className="lcars-log-copy-kicker">{section.heading}</p>
-                  <p>{section.body}</p>
-                </article>
-              ))}
-          </div>
-        </section>
-      </div>
+        <h3>Relationship context</h3>
+        <p>
+          {relatedRecords.length
+            ? relatedRecords
+                .map((record) => `${record.displayName} remains a live cross-reference in this archive.`)
+                .join(" ")
+            : "No immediate live links are attached to this record yet."}
+        </p>
+
+        <h3>Profile note</h3>
+        <p>
+          Threat posture is {formatThreat(activeRecord.threatLevel).toLowerCase()}, diplomatic posture is{" "}
+          {activeRecord.diplomaticPosture}, and the record is tracked as {activeRecord.canonTier} canon.
+        </p>
+      </>
     );
   }
 
   return (
-    <main className="lcars-log-root" style={themeStyle}>
-      <div className="lcars-log-shell">
-        <motion.header
-          animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-          className="lcars-log-header"
-          initial={reducedMotion ? undefined : { opacity: 0, y: 18 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="lcars-log-brand">
-            <div className="lcars-log-brand-block lcars-log-brand-block-primary">
+    <main className="lcars-classic-root">
+      <section className="lcars-classic-shell">
+        <div className="lcars-classic-top">
+          <div className="lcars-classic-left-top">
+            <button className="lcars-classic-brand-button" onClick={() => setScreen("briefing")} type="button">
               <span>Trek</span>
-              <strong>Field Guide</strong>
-            </div>
-            <div className="lcars-log-brand-block lcars-log-brand-block-secondary">
+              Field Guide
+            </button>
+            <div className="lcars-classic-site-map">
               <span>02-site map</span>
               <strong>{activeSectionMeta?.label ?? "Featured deck"}</strong>
             </div>
           </div>
 
-          <div className="lcars-log-heading">
-            <p className="lcars-log-overline">Archive log {activeMode.code}</p>
-            <h1>LCARS archive, simplified.</h1>
-            <p>{activeMode.summary}</p>
-          </div>
+          <div className="lcars-classic-right-top">
+            <div className="lcars-classic-banner">Archive Entry {buildEntryCode(activeRecord)}</div>
 
-          <div className="lcars-log-mode-grid">
-            {modeDeck.map((entry) => (
-              <button
-                className={clsx("lcars-log-mode-button", entry.id === mode && "is-active")}
-                key={entry.id}
-                onClick={() => switchMode(entry.id)}
-                type="button"
-              >
-                <span>{entry.code}</span>
-                <strong>{entry.label}</strong>
-              </button>
-            ))}
-          </div>
-        </motion.header>
+            <div className="lcars-classic-top-band">
+              <div className="lcars-classic-data-cascade" aria-hidden="true">
+                {dataCascade.map((column, index) => (
+                  <div className="lcars-classic-data-column" key={`${column[0]}-${index}`}>
+                    {column.map((value, rowIndex) => (
+                      <span key={`${value}-${rowIndex}`}>{value}</span>
+                    ))}
+                  </div>
+                ))}
+              </div>
 
-        <div className="lcars-log-divider" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
+              <nav className="lcars-classic-screen-nav" aria-label="Archive screens">
+                {screenDeck.map((entry) => (
+                  <button
+                    className={clsx("lcars-classic-screen-button", entry.tone, screen === entry.id && "is-active")}
+                    key={entry.id}
+                    onClick={() => setScreen(entry.id)}
+                    type="button"
+                  >
+                    <span>{entry.code}</span>
+                    <strong>{entry.label}</strong>
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            <div className="lcars-classic-bar-panel lcars-classic-bar-panel-top" aria-hidden="true">
+              <span className="lcars-classic-bar-a" />
+              <span className="lcars-classic-bar-b" />
+              <span className="lcars-classic-bar-c" />
+              <span className="lcars-classic-bar-d" />
+              <span className="lcars-classic-bar-e" />
+            </div>
+          </div>
         </div>
 
-        <div className="lcars-log-grid">
-          <aside className="lcars-log-rail">
-            <button
-              className={clsx("lcars-log-rail-button lcars-log-rail-button-featured", activeSection === "all" && "is-active")}
-              onClick={() => switchSection("all", featuredDeck[0]?.slug ?? defaultPrimarySlug)}
-              type="button"
-            >
-              <span>01-0001</span>
-              <strong>Featured deck</strong>
+        <div className="lcars-classic-bottom">
+          <aside className="lcars-classic-left-frame">
+            <button className="lcars-classic-frame-top-button" onClick={() => setScreen("briefing")} type="button">
+              <span>screen</span> top
             </button>
 
-            {archiveSections.map((section, index) => (
+            <div className="lcars-classic-frame-stack">
               <button
-                className={clsx("lcars-log-rail-button", activeSection === section.type && "is-active")}
-                key={section.type}
-                onClick={() => switchSection(section.type, section.leadSlug)}
+                className={clsx("lcars-classic-frame-panel", "lcars-classic-tone-violet", activeSection === "all" && "is-active")}
+                onClick={() => switchSection("all", featuredDeck[0]?.slug ?? defaultPrimarySlug)}
                 type="button"
               >
-                <span>{buildSectionCode(index)}</span>
-                <strong>{section.label}</strong>
+                <span>01-00001</span>
+                <strong>Featured</strong>
               </button>
-            ))}
+
+              {archiveSections.map((section, index) => (
+                <button
+                  className={clsx(
+                    "lcars-classic-frame-panel",
+                    sectionToneDeck[index % sectionToneDeck.length],
+                    activeSection === section.type && "is-active"
+                  )}
+                  key={section.type}
+                  onClick={() => switchSection(section.type, section.leadSlug)}
+                  type="button"
+                >
+                  <span>{buildSectionCode(index)}</span>
+                  <strong>{section.label}</strong>
+                </button>
+              ))}
+            </div>
+
+            <div className="lcars-classic-mode-summary">
+              <span>{activeMode.code}</span>
+              <strong>{activeMode.label}</strong>
+            </div>
           </aside>
 
-          <section className="lcars-log-main">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.article
-                animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-                className="lcars-log-hero"
-                initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
-                key={`${activeRecord.slug}-${mode}`}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="lcars-log-hero-topline">
-                  <p className="lcars-log-overline">
-                    {formatType(activeRecord.entityType)} archive / {activeRecord.era}
-                  </p>
-                  <div className="lcars-log-hero-stamps">
-                    <span>Stardate {stardate}</span>
-                    <span>{activeRecord.canonTier} canon</span>
-                  </div>
-                </div>
+          <section className="lcars-classic-right-frame">
+            <div className="lcars-classic-bar-panel lcars-classic-bar-panel-bottom" aria-hidden="true">
+              <span className="lcars-classic-bar-f" />
+              <span className="lcars-classic-bar-g" />
+              <span className="lcars-classic-bar-h" />
+              <span className="lcars-classic-bar-i" />
+              <span className="lcars-classic-bar-j" />
+            </div>
 
-                <div className="lcars-log-hero-bars" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                </div>
+            <article className="lcars-classic-article" key={contentKey}>
+              <header className="lcars-classic-article-head">
+                <h1>{activeRecord.displayName}</h1>
+                <p className="lcars-classic-postmeta">
+                  Posted on Stardate {stardate} • {activeRecord.era} • {activeMode.label} lens
+                </p>
+              </header>
 
-                <h2>{activeRecord.displayName}</h2>
-                <p className="lcars-log-hero-copy">{activeRecord.summary}</p>
+              {renderMainContent()}
 
-                <div className="lcars-log-tag-row">
-                  <span>{formatThreat(activeRecord.threatLevel)} threat</span>
-                  <span>{formatType(activeRecord.entityType)}</span>
-                  <span>{activeRecord.era}</span>
-                </div>
+              <p className="lcars-classic-endcap">END ARCHIVE ENTRY</p>
 
-                <div className="lcars-log-action-row">
-                  <button onClick={() => setPanel("overview")} type="button">
-                    Open brief
-                  </button>
-                  <button onClick={() => setPanel("timeline")} type="button">
-                    Timeline
-                  </button>
-                  {relatedRecords[0] ? (
-                    <button onClick={() => openCompare(relatedRecords[0].slug)} type="button">
-                      Compare with {relatedRecords[0].displayName}
-                    </button>
-                  ) : null}
-                </div>
-              </motion.article>
-            </AnimatePresence>
+              <div className="lcars-classic-button-row">
+                <button className="lcars-classic-end-button lcars-classic-tone-violet" onClick={() => setScreen("records")} type="button">
+                  browse /<br />
+                  current deck
+                </button>
 
-            <section className="lcars-log-detail">
-              <div className="lcars-log-tab-row">
-                {panelDeck.map((entry) => (
+                <button
+                  className="lcars-classic-end-button lcars-classic-tone-almond"
+                  onClick={() => {
+                    if (relatedRecords[0]) {
+                      focusEntity(relatedRecords[0].slug);
+                    } else {
+                      setScreen("sources");
+                    }
+                  }}
+                  type="button"
+                >
+                  <span className="lcars-classic-button-kicker">
+                    {relatedRecords[0] ? "related record" : "archive sources"}
+                  </span>
+                  {relatedRecords[0] ? relatedRecords[0].displayName : "open source trail"}
+                </button>
+              </div>
+
+              <div className="lcars-classic-mode-row">
+                {modeDeck.map((entry) => (
                   <button
-                    className={clsx("lcars-log-tab-button", panel === entry.id && "is-active")}
+                    className={clsx("lcars-classic-mode-pill", entry.tone, entry.id === mode && "is-active")}
                     key={entry.id}
-                    onClick={() => setPanel(entry.id)}
+                    onClick={() => switchMode(entry.id)}
                     type="button"
                   >
                     <span>{entry.code}</span>
@@ -634,93 +512,22 @@ export function FieldGuideApp() {
                   </button>
                 ))}
               </div>
+            </article>
 
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.section
-                  animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-                  className="lcars-log-detail-surface"
-                  initial={reducedMotion ? undefined : { opacity: 0, y: 18 }}
-                  key={panelKey}
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {renderPanel()}
-                </motion.section>
-              </AnimatePresence>
-            </section>
+            <footer className="lcars-classic-footer">
+              <p>
+                Archive index {archiveStats.entityCount} records • {archiveStats.relationCount} live links •{" "}
+                {archiveStats.citationCount} citations.
+              </p>
+              <p>
+                Active profile {formatType(activeRecord.entityType)} • threat {formatThreat(activeRecord.threatLevel)} •{" "}
+                {activeRecord.tags.join(" / ")}.
+              </p>
+              <p>{activeMode.summary}</p>
+            </footer>
           </section>
-
-          <aside className="lcars-log-side">
-            <section className="lcars-log-side-block">
-              <div className="lcars-log-card-head">
-                <span>{deferredQuery.trim() ? "Search results" : "Browse deck"}</span>
-                <strong>{activeSectionMeta?.label ?? "Featured"}</strong>
-              </div>
-
-              <label className="lcars-log-search">
-                <span>Search archive</span>
-                <input
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Vulcan, Khitomer, Borg..."
-                  type="search"
-                  value={query}
-                />
-              </label>
-
-              <div className="lcars-log-record-list">
-                {filteredResults.length ? (
-                  filteredResults.slice(0, 6).map((record, index) => (
-                    <button
-                      className="lcars-log-record-button"
-                      key={record.slug}
-                      onClick={() => focusEntity(record.slug)}
-                      type="button"
-                    >
-                      <span>{buildRecordCode(index)}</span>
-                      <strong>{record.displayName}</strong>
-                      <p>{record.summary}</p>
-                    </button>
-                  ))
-                ) : (
-                  <p className="lcars-log-empty">No matching records on the current deck yet.</p>
-                )}
-              </div>
-            </section>
-
-            <section className="lcars-log-side-block">
-              <div className="lcars-log-card-head">
-                <span>System status</span>
-                <strong>Archive stable</strong>
-              </div>
-
-              <div className="lcars-log-stat-grid">
-                {systemStats.map((stat) => (
-                  <article className="lcars-log-stat-card" key={stat.label}>
-                    <span>{stat.label}</span>
-                    <strong>{stat.value}</strong>
-                    <p>{stat.detail}</p>
-                  </article>
-                ))}
-              </div>
-
-              {relatedRecords.length ? (
-                <div className="lcars-log-chip-grid">
-                  {relatedRecords.slice(0, 4).map((record) => (
-                    <button
-                      className={clsx("lcars-log-chip-button", resolvedCompareSlug === record.slug && "is-active")}
-                      key={record.slug}
-                      onClick={() => openCompare(record.slug)}
-                      type="button"
-                    >
-                      <span>{formatType(record.entityType)}</span>
-                      <strong>{record.displayName}</strong>
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </section>
-          </aside>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
